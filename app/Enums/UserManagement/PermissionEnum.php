@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Enums\UserManagement;
+
+
+enum PermissionEnum : string
+{
+    case RECRUITMENT = 'RECRUITMENT';
+    case RECRUITMENT_VIEW = 'RECRUITMENT VIEW';
+    case GENERATING_ID = 'GENERATING ID';
+    case OFFICE_MANAGEMENT = 'OFFICE MANAGEMENT';
+    case USER_MANAGEMENT = 'USER MANAGEMENT';
+    case PSB_GRADE_BULK = 'PSB GRADE BULK';
+    case LEAVE_MANAGEMENT_PERSONNEL = 'LEAVE MANAGEMENT PERSONNEL';
+}

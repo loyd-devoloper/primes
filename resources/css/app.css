@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    img {
+        @apply inline-block;
+    }
+}
+.xx{
+    @apply text-red-500 bg-red-500;
+}
+
+.gradeContainer{
+    @apply  gap-1;
+}
+.gradeContainer > div:first-child > div{
+    @apply flex-none w-[45svw];
+}
+.gradeContainer > div:first-child{
+    @apply flex-none w-fit;
+}
+.gradeContainer:last-child{
+    @apply w-full ;
+}
+#attachmentContainer{
+    @apply border-r-8  w-[45svw] h-fit  border-dashed border-opacity-50;
+}
+
+/*check file*/
+.checkFileApproved{
+    @apply bg-green-200;
+}
+.checkFileDisApproved{
+    @apply bg-red-200;
+}
+.fi-modal > div {
+    @apply !z-50 ;
+}
+/* pdf size */
+.pdfPage{
+    size: 7in 9.25in;
+
+}
+
+/* file upload input */
+.filepond--list {
+    @apply  min-h-[80svh];
+}
+.filepond--item{
+    @apply bg-red-500;
+}
+.filepond--list-scroller{
+    @apply  min-h-[80svh];
+}
+
+/* table row/column padding */
+.fi-ta-ctn .py-4 {
+    padding-top: .5rem !important;
+    padding-bottom: .5rem !important;
+}
+
+    /* leave */
+.leave-head{
+    @apply bg-blue-100 dark:bg-blue-700;
+}
+.leave-cao{
+    @apply bg-lime-100 dark:bg-lime-700;
+}
+.leave-rd{
+    @apply bg-red-100 dark:bg-red-700;
+}
+#my-node {
+    background-color: white;
+    @apply bg-white;
+}
+
+.hired {
+    @apply bg-green-500 dark:bg-green-900;
+}
+
+/* input css */
+.defaultInput {
+    @apply py-1.5 rounded-none focus-within:ring-1 ring-1 !important;
+}
+
+.defaultInputCenter {
+    @apply py-1.5 rounded-none focus-within:ring-1 ring-1 text-center !important;
+}
+
+.defaultInputRoundedWithIcon {
+    @apply py-1.5 rounded w-full focus-within:ring-1 ring-1 px-8 relative dark:ring-gray-300 !important;
+}
+
+.btn {
+    @apply bg-cyan-500 w-full;
+}
+
+.dropdownImage {
+    @apply bg-red-500 right-0 left-auto;
+}
+
+.sectionNoBorder {
+    @apply border-none shadow-none ring-0;
+}
+
+.a {
+    @apply hover:underline cursor-pointer;
+}
+
+#validator {
+    @apply border-blue-500 text-blue-500 !important;
+}
+
+#validator>.fi-badge {
+    @apply border-blue-500 text-blue-500 !important;
+}
+
+#validator>.fi-tabs-item-label {
+    @apply border-blue-500 text-blue-500 !important;
+}
+
+#validator>.fi-tabs-item-icon {
+    @apply border-blue-500 text-blue-500 !important;
+}
+
+#checkfile {
+    @apply border-yellow-500 text-yellow-500 !important;
+}
+
+#checkfile>.fi-badge {
+    @apply border-yellow-500 text-yellow-500 !important;
+}
+
+#checkfile>.fi-tabs-item-label {
+    @apply border-yellow-500 text-yellow-500 !important;
+}
+
+#checkfile>.fi-tabs-item-icon {
+    @apply border-yellow-500 text-yellow-500 !important;
+}
+
+
+#notqualified {
+    @apply border-red-500 text-red-500 !important;
+}
+
+#notqualified>.fi-badge {
+    @apply border-red-500 text-red-500 !important;
+}
+
+#notqualified>.fi-tabs-item-label {
+    @apply border-red-500 text-red-500 !important;
+}
+
+#notqualified>.fi-tabs-item-icon {
+    @apply border-red-500 text-red-500 !important;
+}
+
+#qualified {
+    @apply border-green-500 text-green-500 !important;
+}
+
+#qualified>.fi-badge {
+    @apply border-green-500 text-green-500 !important;
+}
+
+#qualified>.fi-tabs-item-label {
+    @apply border-green-500 text-green-500 !important;
+}
+
+#qualified>.fi-tabs-item-icon {
+    @apply border-green-500 text-green-500 !important;
+}
+
+
+/* RSA TABLE */
+#perStepCheck {
+    @apply bg-yellow-500 !important;
+}
+
+#perStepValidate {
+    @apply bg-blue-500 !important;
+}
+
+#perStepQualified {
+    @apply bg-green-500 !important;
+}
+
+#perStepNotQualified {
+    @apply bg-red-500 !important;
+}
+
+
+/* notification */
+.filament-notifications-close-button {
+    @apply !bg-red-600;
+}
+
+
+/* PSB */
+#psbtablegrade {
+    @apply max-h-[60dvh] overflow-y-auto;
+}
+
+.psbAllicantInformationDesign {
+    @apply text-black dark:text-white;
+}
+
+
+/* MONITORING */
+.monitoringTab {
+    @apply dark:text-white !important;
+}
+
+
+/* ID */
+.viewLogId {
+    @apply max-h-[60dvh] overflow-y-auto;
+}
+
+
+/* apex chart */
+.apexcharts-text tspan {
+    @apply !bg-red-500 text-red-500 !important;
+}
+
+
+
+
