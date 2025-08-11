@@ -7,13 +7,15 @@
 
 
 
-                    {{ ($getAction('dtr'))([1 => $this->dtrArrView]) }}
-                    <div x-data="{model: @js($this->dtrArrView)}">
-                        {{$this->form}}
+                    <?php echo e(($getAction('dtr'))([1 => $this->dtrArrView])); ?>
+
+                    <div x-data="{model: <?php echo \Illuminate\Support\Js::from($this->dtrArrView)->toHtml() ?>}">
+                        <?php echo e($this->form); ?>
+
                     </div>
 
-                    {{-- Content --}}
-                    <div x-data="{employee: @js(json_decode($this->dtrArrView['dtr'])->data)}">
+                    
+                    <div x-data="{employee: <?php echo \Illuminate\Support\Js::from(json_decode($this->dtrArrView['dtr'])->data)->toHtml() ?>}">
                         <table>
                             <tr>
                                 <td class="border px-2.5 text-center" rowspan="2">Days</td>
@@ -30,15 +32,16 @@
                                 <td class="border px-2.5 text-center">Minutes</td>
                             </tr>
 
-                            @foreach(json_decode($this->dtrArrView['dtr'])->data as $dateKey => $date)
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($this->dtrArrView['dtr'])->data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                                <tr x-data="{date: @js($date)}">
+                                <tr x-data="{date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?>}">
                                     <td class="border px-2.5 font-bold text-center"
                                         :class="{
                                                                 'bg-gray-500': date.fc,
                                                             }">
 
-                                        {{explode('-',$dateKey)[1]}}
+                                        <?php echo e(explode('-',$dateKey)[1]); ?>
+
                                     </td>
                                     <td class=" px-2.5 text-center border"
                                         :class="{
@@ -74,7 +77,7 @@
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
                                         x-text="decrease(date)"></td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                             <div>
                                 <p x-text="month" class="font-bold"></p>
 
@@ -93,12 +96,15 @@
 
 </div>
 
-@script
+    <?php
+        $__scriptKey = '133440256-0';
+        ob_start();
+    ?>
 <script>
     Alpine.data('dtrx', () => ({
-        {{--// disabledDate: $wire.{{ $applyStateBindingModifiers("\$entangle('dtrArr')"),--}}
+        
         //            disabledDate:$wire.$entangle('dtrArrView'),
-        disabledDate: @js(json_decode($getRecord()->dtr)),
+        disabledDate: <?php echo \Illuminate\Support\Js::from(json_decode($getRecord()->dtr))->toHtml() ?>,
         month: $wire.$entangle('month'),
         total: 0,
         convertUndertime(type, date) {
@@ -188,4 +194,9 @@
         }
     }));
 </script>
-@endscript
+    <?php
+        $__output = ob_get_clean();
+
+        \Livewire\store($this)->push('scripts', $__output, $__scriptKey)
+    ?>
+<?php /**PATH /home/loyd-deped/Desktop/www/PDS/resources/views/livewire/leave/asset/dtr_view.blade.php ENDPATH**/ ?>

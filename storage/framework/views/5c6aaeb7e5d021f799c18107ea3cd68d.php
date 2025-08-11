@@ -64,6 +64,7 @@
 
         <div class=" space-y-6 py-10 text-xs dark:text-white" x-show="Object.keys(disabledDate).length > 0">
             <template x-for="(employee,index) in disabledDate" :key="index">
+
                 <?php if (isset($component)) { $__componentOriginalee08b1367eba38734199cf7829b1d1e9 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalee08b1367eba38734199cf7829b1d1e9 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.section.index','data' => ['collapsible' => true,'size' => 'sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -74,7 +75,32 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['collapsible' => true,'size' => 'sm']); ?>
+
                      <?php $__env->slot('heading', null, []); ?> 
+                        <label>
+                            <?php if (isset($component)) { $__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.checkbox','data' => ['wire:model' => 'isAdmin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::input.checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model' => 'isAdmin']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d)): ?>
+<?php $attributes = $__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d; ?>
+<?php unset($__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d)): ?>
+<?php $component = $__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d; ?>
+<?php unset($__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d); ?>
+<?php endif; ?>
+
+
+                        </label>
                         <span x-text="index"></span>
                      <?php $__env->endSlot(); ?>
                     <div>
@@ -105,33 +131,41 @@
 
                                             'text-red-500': date.type === 'Absent',
                                             'font-bold': date.type === 'Absent' || typeof(
-                                                date
-                                            ) === 'string' ? true : false // This will ensure 'font-bold' is applied if type is 'Absent'
+                                                    date
+                                                ) === 'string' ? true :
+                                                false // This will ensure 'font-bold' is applied if type is 'Absent'
                                         }"
-                                        :colspan="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 6 : 1"
+                                        :colspan="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            6 : 1"
                                         x-text="convertDate(date)"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_departure_am"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_arrival_pm">
                                     </td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_departure_pm"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="convertUndertime('h',date)">
 
                                     </td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="convertUndertime('m',date)">
 
                                     </td>
                                     <td class="whitespace-nowrap"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="decrease(date)"></td>
                                 </tr>
                             </template>
@@ -255,18 +289,18 @@
             },
             init() {
                 this.$watch('disabledDate', (val) => {
-                  Object.values(val).forEach(newVal => {
+                    Object.values(val).forEach(newVal => {
 
-                                     Object.values(newVal.data).forEach(element => {
+                        Object.values(newVal.data).forEach(element => {
 
-                        if (element.type == 'UT') {
-                            this.total += parseInt(element.undertime)
-                        }
-                        if (element.late > 0 && element.type == 'Full') {
-                            this.total += parseInt(element.late)
-                        }
+                            if (element.type == 'UT') {
+                                this.total += parseInt(element.undertime)
+                            }
+                            if (element.late > 0 && element.type == 'Full') {
+                                this.total += parseInt(element.late)
+                            }
+                        });
                     });
-                                    });
 
                 })
 

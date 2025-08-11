@@ -10,8 +10,15 @@
 
         <div class=" space-y-6 py-10 text-xs dark:text-white" x-show="Object.keys(disabledDate).length > 0">
             <template x-for="(employee,index) in disabledDate" :key="index">
+
                 <x-filament::section collapsible size="sm">
+
                     <x-slot name="heading">
+                        <label>
+                            <x-filament::input.checkbox wire:model="isAdmin" />
+
+
+                        </label>
                         <span x-text="index"></span>
                     </x-slot>
                     <div>
@@ -42,33 +49,41 @@
 
                                             'text-red-500': date.type === 'Absent',
                                             'font-bold': date.type === 'Absent' || typeof(
-                                                date
-                                            ) === 'string' ? true : false // This will ensure 'font-bold' is applied if type is 'Absent'
+                                                    date
+                                                ) === 'string' ? true :
+                                                false // This will ensure 'font-bold' is applied if type is 'Absent'
                                         }"
-                                        :colspan="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 6 : 1"
+                                        :colspan="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            6 : 1"
                                         x-text="convertDate(date)"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_departure_am"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_arrival_pm">
                                     </td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="date.date_departure_pm"></td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="convertUndertime('h',date)">
 
                                     </td>
                                     <td class="border px-2.5 text-center"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="convertUndertime('m',date)">
 
                                     </td>
                                     <td class="whitespace-nowrap"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
                                         x-text="decrease(date)"></td>
                                 </tr>
                             </template>
@@ -180,18 +195,18 @@
             },
             init() {
                 this.$watch('disabledDate', (val) => {
-                  Object.values(val).forEach(newVal => {
+                    Object.values(val).forEach(newVal => {
 
-                                     Object.values(newVal.data).forEach(element => {
+                        Object.values(newVal.data).forEach(element => {
 
-                        if (element.type == 'UT') {
-                            this.total += parseInt(element.undertime)
-                        }
-                        if (element.late > 0 && element.type == 'Full') {
-                            this.total += parseInt(element.late)
-                        }
+                            if (element.type == 'UT') {
+                                this.total += parseInt(element.undertime)
+                            }
+                            if (element.late > 0 && element.type == 'Full') {
+                                this.total += parseInt(element.late)
+                            }
+                        });
                     });
-                                    });
 
                 })
 

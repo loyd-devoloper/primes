@@ -221,7 +221,7 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
             });
     }
 
-    // ADD NEW CTO
+    // UPDATE LEAVE
     public function slideOverNewLeaveAction()
     {
         return \Filament\Actions\Action::make('slideOverNewLeave')
@@ -232,10 +232,10 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
             ->size('sm')
             ->form([
 
-                TextInput::make('sl')->label('Sick Leave (SL)')->numeric()->required()->step('any')->helperText("Current Points: 1")->default($this->leaves?->sl),
-                TextInput::make('vl')->label('Vacation Leave (VL)')->numeric()->required()->step('any')->helperText("Current Points: 1")->default($this->leaves?->vl),
-                TextInput::make('fl')->label('Force Leave (FL)')->numeric()->required()->step('any')->helperText("Current Points: 1")->default($this->leaves?->fl),
-                TextInput::make('spl')->label('Special Privilege Leave(SPL)')->numeric()->required()->step('any')->helperText("Current Points: 1")->default($this->leaves?->spl),
+                TextInput::make('sl')->label('Sick Leave (SL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->sl)->default($this->leaves?->sl),
+                TextInput::make('vl')->label('Vacation Leave (VL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->vl)->default($this->leaves?->vl),
+                TextInput::make('fl')->label('Force Leave (FL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->fl)->default($this->leaves?->fl),
+                TextInput::make('spl')->label('Special Privilege Leave(SPL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->spl)->default($this->leaves?->spl),
                 Select::make('current_month')
                     ->label('Month')
                     ->options([

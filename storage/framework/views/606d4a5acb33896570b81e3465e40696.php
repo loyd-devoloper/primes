@@ -1,28 +1,61 @@
-@assets
+    <?php
+        $__assetKey = '3264281824-0';
+
+        ob_start();
+    ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="{{ asset('canva.js') }}"></script>
-@endassets
+    <script src="<?php echo e(asset('canva.js')); ?>"></script>
+    <?php
+        $__output = ob_get_clean();
+
+        // If the asset has already been loaded anywhere during this request, skip it...
+        if (in_array($__assetKey, \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys)) {
+            // Skip it...
+        } else {
+            \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $__assetKey;
+            \Livewire\store($this)->push('assets', $__output, $__assetKey);
+        }
+    ?>
 <div>
 
     <main x-data="skillDisplay">
-        {{--        <button  class="bg-gray-500 px-6 py-2">Generate PDF</button> --}}
-        <x-filament::icon-button icon="heroicon-m-printer" label="Print" color="secondary" type="button"
-            x-on:click="generateMe()" />
-             {{-- Content --}}
-            <div x-data="{ model: @js($this->dtrArrView) }" class="max-w-[15rem] px-1 mb-2">
-                {{ $this->form }}
+        
+        <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','xOn:click' => 'generateMe()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','x-on:click' => 'generateMe()']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $attributes = $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+             
+            <div x-data="{ model: <?php echo \Illuminate\Support\Js::from($this->dtrArrView)->toHtml() ?> }" class="max-w-[15rem] px-1 mb-2">
+                <?php echo e($this->form); ?>
+
             </div>
         <div id="table" class="block w-fit  overflow-x-auto   mx-auto text-xs relative ">
 
 
             <div class=" ">
-                <img src="{{ $qrcode }}" id="qr_code_b" class="absolute  w-[3rem] top-0 right-2" alt="">
-                <img src="{{ asset('/assets/dtr_image.png') }}" class="max-w-[29rem] " alt="">
+                <img src="<?php echo e($qrcode); ?>" id="qr_code_b" class="absolute  w-[3rem] top-0 right-2" alt="">
+                <img src="<?php echo e(asset('/assets/dtr_image.png')); ?>" class="max-w-[29rem] " alt="">
                 <p class="py-2 "><i>Civil Service Form No. 48</i></p>
                 <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
                 <p class="text-center ">-----o0o-----</p>
                 <p class="border-b border-black text-center font-bold mt-4">
-                    {{ explode('--', $this->dtrArrView['user_name'])[1] }}</p>
+                    <?php echo e(explode('--', $this->dtrArrView['user_name'])[1]); ?></p>
                 <h6 class="text-center text-xs">(Name)</h6>
                 <div class="grid grid-cols-5 pt-5">
                     <div class="col-span-2 px-3">
@@ -31,7 +64,8 @@
                         <p class="text-center">for arrival and departure</p>
                     </div>
                     <div class="col-span-3">
-                        <p class="border-b border-black text-center font-bold uppercase">{{ $this->dtrArrView['date'] }}
+                        <p class="border-b border-black text-center font-bold uppercase"><?php echo e($this->dtrArrView['date']); ?>
+
                         </p>
                         <div class="grid grid-cols-2 py-1">
                             <p class="text-center">Regular days</p>
@@ -43,8 +77,8 @@
                         </div>
                     </div>
                 </div>
-                {{-- Content --}}
-                <div x-data="{ employee: @js($this->dtrArrView) }" class=" max-w-[29rem]  h-full pt-10">
+                
+                <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($this->dtrArrView)->toHtml() ?> }" class=" max-w-[29rem]  h-full pt-10">
                     <table class="border-collapse w-full ">
                         <tr class="">
                             <td class="border border-black border-solid px-2.5 text-center" rowspan="2">Days</td>
@@ -64,11 +98,12 @@
                             <td class="border-b border-r border-black border-solid px-2.5 text-center">Minutes</td>
                         </tr>
 
-                        @foreach (json_decode($this->dtrArrView['dtr'])->data as $dateKey => $date)
-                            <tr x-data="{ date: @js($date) }">
+                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($this->dtrArrView['dtr'])->data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <tr x-data="{ date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?> }">
                                 <td
                                     class="border-l border-b border-black border-solid px-2.5 py-1  font-bold text-center whitespace-nowrap">
-                                    {{ explode('-', $dateKey)[1] }}
+                                    <?php echo e(explode('-', $dateKey)[1]); ?>
+
                                 </td>
                                 <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                     :class="{
@@ -99,11 +134,11 @@
                                     x-text="convertUndertime('m',date)">
 
                                 </td>
-                                {{--                                    <td class="whitespace-nowrap" --}}
-                                {{--                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''" --}}
-                                {{--                                        x-text="decrease(date)"></td> --}}
+                                
+                                
+                                
                             </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
                     </table>
                 </div>
@@ -127,7 +162,10 @@
     </main>
 
 </div>
-@script
+    <?php
+        $__scriptKey = '3264281824-1';
+        ob_start();
+    ?>
     <script>
         Alpine.data('skillDisplay', () => ({
             aside: true,
@@ -274,4 +312,9 @@
 
         }));
     </script>
-@endscript
+    <?php
+        $__output = ob_get_clean();
+
+        \Livewire\store($this)->push('scripts', $__output, $__scriptKey)
+    ?>
+<?php /**PATH /home/loyd-deped/Desktop/www/PDS/resources/views/livewire/leave/asset/dtr_print.blade.php ENDPATH**/ ?>

@@ -50,7 +50,7 @@
                 {{-- <h1 class="absolute rotate-45 font-mono text-4xl top-28 font-extrabold right-1 opacity-20 ">PERSONNEL SECTION</h1> --}}
 
                 @foreach ($leaveData as $leave)
-                    @if ($leave->start_date < \Carbon\Carbon::now())
+
                     <tr>
                         <td class="border border-black dark:border-white" style=" padding: 8px;text-align: center">
                             {{ $leave->period }}</td>
@@ -97,12 +97,12 @@
                         </td>
                         <td class="border border-black dark:border-white" style=" padding: 8px;text-align: center">
                             {{ $leave->type == 'CTO' ? $leave?->w_o_pay : '' }}</td>
-                        <td class="border border-black dark:border-white"
+                        <td class="border border-black dark:border-white break-words"
                             style=" padding: 0px;max-width: 4rem;text-align: center">
                             <p style="">{{ $leave?->remarks }}</p>
                         </td>
                     </tr>
-                    @endif
+
                 @endforeach
 
             </tbody>

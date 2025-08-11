@@ -86,7 +86,7 @@
                         </td>
                         <td style="border: 1px solid black; padding: 8px;text-align: center">
                             <?php echo e($leave->type == 'SL' ? $leave?->w_o_pay : ''); ?></td>
-                        <td style="border: 1px solid black; padding: 0px;max-width: 4rem;text-align: center">
+                        <td style="border: 1px solid black; padding: 0px;max-width: 4rem;text-align: center;overflow-wrap: break-word;">
                             <p style=""><?php echo e($leave?->remarks); ?></p>
                         </td>
                     </tr>

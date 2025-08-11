@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('batch');
             $table->string('id_number');
             $table->json('dtr');
+            $table->uuid('group_id');
+            $table->string('user_name');
             $table->string('date');
 
             $table->timestamps();

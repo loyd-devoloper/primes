@@ -17,6 +17,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\BulkAction;
@@ -24,6 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -474,278 +476,284 @@ class Employees extends Component  implements HasForms, HasTable
                 fn($record): bool => !!$this->dateFilter
             )
             ->actions([
-                Action::make('Leave Dashboardx')
-                    ->form([
+                ActionGroup::make([
+                    Action::make('Leave Dashboardx')
+                        ->label('LATE UNDERTIME')
+                        ->form(function ($record) {
+                            return [
+                                Fieldset::make('Label')->label('L/UT')
+                                    ->schema([
+                                        Repeater::make('L/UT')
+                                            ->label(false)
+                                            ->schema([
+                                                TextInput::make('particular')->label('L / UT')->required()->mask('99-99-99') ->hint('Day-Hour-Minute')->live()
+                                                    ->helperText(function (Set $set, Get $get) {
+                                                        $advanceSetting = \App\Models\Leave\LeaveAdvanceSetting::query()->where('id', 1)->first();
+                                                        if (preg_match('/^\d{2}-\d{2}-\d{2}$/', $get('particular'))) {
+                                                            [$day, $hour, $min] = explode('-', $get('particular'));
 
-                        Repeater::make('L/UT')
-                            ->schema([
-                                TextInput::make('particular')->label('L / UT')->required()->mask('99-99-99')->hint('Day-Hour-Minute')->live()
-                                    ->helperText(function (Set $set, Get $get) {
-                                        $advanceSetting = \App\Models\Leave\LeaveAdvanceSetting::query()->where('id', 1)->first();
-                                        if ($get('particular') && preg_match('/^\d+-\d+-\d+$/', $get('particular'))) {
-                                            [$day, $hour, $min] = explode('-', $get('particular'));
-                                            $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
-                                            $set('slug', 'dsad');
+                                                            $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
 
-                                            return $total;
-                                        }
-                                    }),
-                                DatePicker::make('date')->required()->maxDate(Carbon::parse('May')->lastOfMonth())->native(false)
-                            ])
-                            ->columns(2)->afterStateUpdated(function (Set $set, $state, Get $get) {
+
+                                                            return $total;
+                                                        }
+                                                    }),
+                                                DatePicker::make('date')->required()
+                                                ->minDate(Carbon::parse($record?->leavePointLatest?->current_month)->firstOfMonth())
+                                                ->maxDate(Carbon::parse($record?->leavePointLatest?->current_month)->lastOfMonth())->native(false),
+                                                Textarea::make('remarks')->label('remarks')->required()
+                                            ])
+                                            ->columns(2)
+                                    ])->columns(1),
+                                Fieldset::make('month')->label('Monthly Earn')->schema([
+                                    TextInput::make('vl_earn')->step('any')->numeric()->default(1.25),
+                                            TextInput::make('sl_earn')->step('any')->numeric()->default(1.25),
+                                ])
+
+
+                            ];
+                        })
+                        ->icon('heroicon-o-exclamation-circle')
+                        ->action(function ($data, $record) {
+                            try {
+                                DB::beginTransaction();
+                                $sorted = collect($data['L/UT'])->sortBy('date')->values()->all();
+
+                                $currentMonth = Carbon::parse($record?->leavePointLatest?->current_month);
+                                $newCurrentMonth = Carbon::parse($record?->leavePointLatest?->current_month)->addMonth();
+
                                 $advanceSetting = \App\Models\Leave\LeaveAdvanceSetting::query()->where('id', 1)->first();
 
-                                $monthly_earn = 0;
-                                foreach ($get('L/UT') as $key => $value) {
-
-                                    if ($value['particular'] && preg_match('/^\d+-\d+-\d+$/', $value['particular'])) {
-                                        [$day, $hour, $min] = explode('-', $value['particular']);
-                                        $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
-                                        $monthly_earn += $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
-                                    }
+                                foreach ($sorted as $key => $value) {
+                                    [$day, $hour, $min] = explode('-', $value['particular']);
+                                    $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
+                                    $record->leavePointLatest->update([
+                                        'vl' => (float)$record->leavePointLatest?->vl - $total
+                                    ]);
+                                    \App\Models\Leave\LeaveCard::query()
+                                        ->create([
+                                            'start_date' => Carbon::parse($value['date']),
+                                            'days' => str_pad($day, 2, '0', STR_PAD_LEFT),
+                                            'hours' => $hour,
+                                            'mins' => $min,
+                                            'w_pay' => $total,
+                                            'type' => "L/UT",
+                                            'remarks' => $value['remarks'],
+                                            'vl_balance' => $record->leavePointLatest?->vl,
+                                            'sl_balance' => $record->leavePointLatest?->sl,
+                                            'id_number' => $record->id_number
+                                        ]);
                                 }
-                                $set('monthly_earn',  '1.25 - ' . round($monthly_earn, 3) . " =" . (1.25 - round($monthly_earn, 3)) . "");
-                            }),
-                        Textarea::make('monthly_earn')->readonly()->disabled(true),
-
-                    ])
-                    ->icon('heroicon-o-computer-desktop')
-                    ->action(function ($data, $record) {
-                        try {
-                            DB::beginTransaction();
-                            $sorted = collect($data['L/UT'])->sortBy('date')->values()->all();
-
-                            $currentMonth = Carbon::parse($record?->leavePointLatest?->current_month);
-
-                            $advanceSetting = \App\Models\Leave\LeaveAdvanceSetting::query()->where('id', 1)->first();
-
-                            foreach ($sorted as $key => $value) {
-                                [$day, $hour, $min] = explode('-', $value['particular']);
-                                $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
-                                $record->leavePointLatest->update([
-                                    'vl' => (float)$record->leavePointLatest?->vl - $total
-                                ]);
                                 \App\Models\Leave\LeaveCard::query()
                                     ->create([
-                                        'start_date' => Carbon::parse($value['date']),
-                                        'days' => str_pad($day, 2, '0', STR_PAD_LEFT),
-                                        'hours' => $hour,
-                                        'mins' => $min,
-                                        'w_pay' => $total,
-                                        'type' => "L/UT",
-                                        'remarks' => $value['date'],
+                                        'start_date' => $currentMonth->lastOfMonth(),
+                                        'period' => $currentMonth->format('F d, Y'),
+                                        'days' => '00',
+                                        'hours' => '00',
+                                        'mins' => '00',
+                                        'w_pay' => '00',
+                                        'vl_earn' => $data['vl_earn'],
+                                        'sl_earn' =>$data['sl_earn'],
+                                        'type' => null,
+                                        'remarks' => null,
+                                        'vl_balance' => (float)$record->leavePointLatest?->vl + (float)$data['vl_earn'],
+                                        'sl_balance' => (float)$record->leavePointLatest?->sl + (float)$data['sl_earn'],
+                                        'id_number' => $record->id_number
+                                    ]);
+
+
+
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $newCurrentMonth->firstOfMonth(),
+                                        'period' => $newCurrentMonth->format('F Y'),
+                                        'days' => '00',
+                                        'hours' => '00',
+                                        'mins' => '00',
+                                        'w_pay' => '00',
+                                        'type' => null,
+                                        'remarks' => null,
+
+                                        'id_number' => $record->id_number
+                                    ]);
+                                         $record?->leavePointLatest->update([
+                                    'current_month' => $newCurrentMonth->format('F'),
+                                    'vl' => (float)$record->leavePointLatest?->vl + (float)$data['sl_earn'],
+                                    'sl' => (float)$record->leavePointLatest?->sl + (float)$data['sl_earn'],
+                                ]);
+                                DB::commit();
+                            } catch (\Exception $e) {
+                                DB::rollBack();
+                            }
+                        })->stickyModalHeader()->stickyModalFooter(),
+                    Action::make('upload offline Leave Form')
+                        ->label('UPLOAD OFFLINE LEAVE FORM')
+                        ->icon('heroicon-o-academic-cap')
+                        ->form([
+                            TextInput::make('subject_title')->label('Title/Subject')->required(),
+                            Select::make('type_of_leave')->required()
+                                ->label(new HtmlString("TYPE OF LEAVE <span class='text-red-500'>(required)</span>"))
+                                ->options(function () {
+                                    $arr = [];
+                                    foreach (\App\Enums\TypeOfLeaveEnum::cases() as $key => $d) {
+                                        $arr[$d->value] = $d->value;
+                                    }
+                                    return $arr;
+                                })
+                                ->validationMessages([
+                                    'required' => 'The Type of Leave field is required.',
+                                ])
+                                ->columnSpanFull()
+                                ->rules('required')
+                                ->reactive(),
+                            DatePicker::make('start_date')->label('Applied Date')->required(),
+                            TextInput::make('paid_days')->label('NUMBER OF WORKING DAYS')->numeric()->required(),
+                            Textarea::make('remarks')->placeholder('Dec 20,21,21 2024')->required(),
+                            FileUpload::make('attachment')
+                                ->directory(Carbon::now()->format('Y') . '/leave/offline')
+                                ->acceptedFileTypes(['application/pdf'])->required()
+                        ])
+                        ->action(function ($data, $record) {
+
+                            $start = Carbon::parse($data['start_date'])->format('F Y');
+
+
+                            // $startMonth = $now->firstOfMonth();
+                            $startMonth = Carbon::parse($data['start_date']);
+                            $arr['subject_title'] = $data['subject_title'];
+                            $arr['days'] = $data['paid_days'];
+                            $arr['id_number'] = $record->id_number;
+
+                            $arr['status'] = \App\Enums\LeaveStatusEnum::APPROVED->value;
+                            $arr['type_of_leave'] = $data['type_of_leave'];
+                            $arr['type_of_process'] = "offline";
+                            $arr['original_file'] = $data['attachment'];
+
+                            // if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::OTHERS->value) {
+                            //     $arr['others'] = $arr['other_leave'];
+                            // }
+
+                            $leaveId = \App\Models\LeaveEmployeeRequest::create($arr);
+
+                            if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::SICK_LEAVE->value) {
+                                $record->leavePointLatest->update([
+                                    'sl' => (float)$record->leavePointLatest?->sl - (float)$data['paid_days']
+                                ]);
+
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $startMonth,
+                                        'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
+                                        'hours' => "00",
+                                        'mins' => "00",
+                                        'w_pay' => $data['paid_days'],
+                                        'type' => "SL",
+                                        'remarks' => $data['remarks'],
                                         'vl_balance' => $record->leavePointLatest?->vl,
                                         'sl_balance' => $record->leavePointLatest?->sl,
                                         'id_number' => $record->id_number
                                     ]);
-                            }
-
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $currentMonth->lastOfMonth(),
-                                    'period' => $currentMonth->format('F d, Y'),
-                                    'days' => '00',
-                                    'hours' => '00',
-                                    'mins' => '00',
-                                    'w_pay' => '00',
-                                    'vl_earn' => 1.25,
-                                    'sl_earn' => 1.25,
-                                    'type' => null,
-                                    'remarks' => null,
-                                    'vl_balance' => (float)$record->leavePointLatest?->vl + 1.25,
-                                    'sl_balance' => (float)$record->leavePointLatest?->sl + 1.25,
-                                    'id_number' => $record->id_number
+                            } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::FORCE_LEAVE->value) {
+                                $record->leavePointLatest->update([
+                                    'vl' => (float)$record->leavePointLatest?->vl - (float)$data['paid_days'],
+                                    'fl' => (float)$record->leavePointLatest?->fl - (float)$data['paid_days'],
                                 ]);
 
-                            $record?->leavePointLatest->update([
-                                'current_month' => $currentMonth->addMonth()->format('F'),
-                                'vl' => (float)$record->leavePointLatest?->vl + 1.25,
-                                'sl' => (float)$record->leavePointLatest?->sl + 1.25,
-                            ]);
 
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $currentMonth->firstOfMonth(),
-                                    'period' => $currentMonth->format('F Y'),
-                                    'days' => '00',
-                                    'hours' => '00',
-                                    'mins' => '00',
-                                    'w_pay' => '00',
-                                    'type' => null,
-                                    'remarks' => null,
-
-                                    'id_number' => $record->id_number
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $startMonth,
+                                        'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
+                                        'hours' => "00",
+                                        'mins' => "00",
+                                        'w_pay' => $data['paid_days'],
+                                        'type' => "FL",
+                                        'remarks' => $data['remarks'],
+                                        'vl_balance' => $record->leavePointLatest?->vl,
+                                        'sl_balance' => $record->leavePointLatest?->sl,
+                                        'id_number' => $record->id_number
+                                    ]);
+                            } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::VACATION_LEAVE->value) {
+                                $record->leavePointLatest->update([
+                                    'vl' => (float)$record->leavePointLatest?->vl - (float)$data['paid_days']
                                 ]);
-                            DB::commit();
-                        } catch (\Exception $e) {
-                            DB::rollBack();
-                        }
-                    }),
-                Action::make('upload offline Leave Form')
-                    ->icon('heroicon-o-academic-cap')
-                    ->form([
-                        TextInput::make('subject_title')->label('Title/Subject')->required(),
-                        Select::make('type_of_leave')->required()
-                            ->label(new HtmlString("TYPE OF LEAVE <span class='text-red-500'>(required)</span>"))
-                            ->options(function () {
-                                $arr = [];
-                                foreach (\App\Enums\TypeOfLeaveEnum::cases() as $key => $d) {
-                                    $arr[$d->value] = $d->value;
-                                }
-                                return $arr;
-                            })
-                            ->validationMessages([
-                                'required' => 'The Type of Leave field is required.',
-                            ])
-                            ->columnSpanFull()
-                            ->rules('required')
-                            ->reactive(),
-                        DatePicker::make('start_date')->label('Applied Date')->required(),
-                        TextInput::make('paid_days')->label('NUMBER OF WORKING DAYS')->numeric()->required(),
-                        Textarea::make('remarks')->placeholder('Dec 20,21,21 2024')->required(),
-                        FileUpload::make('attachment')
-                            ->directory(Carbon::now()->format('Y') . '/leave/offline')
-                            ->acceptedFileTypes(['application/pdf'])->required()
-                    ])
-                    ->action(function ($data, $record) {
-
-                        $start = Carbon::parse($data['start_date'])->format('F Y');
 
 
-                        // $startMonth = $now->firstOfMonth();
-                        $startMonth = Carbon::parse($data['start_date']);
-                        $arr['subject_title'] = $data['subject_title'];
-                        $arr['days'] = $data['paid_days'];
-                        $arr['id_number'] = $record->id_number;
-
-                        $arr['status'] = \App\Enums\LeaveStatusEnum::APPROVED->value;
-                        $arr['type_of_leave'] = $data['type_of_leave'];
-                        $arr['type_of_process'] = "offline";
-                        $arr['original_file'] = $data['attachment'];
-
-                        // if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::OTHERS->value) {
-                        //     $arr['others'] = $arr['other_leave'];
-                        // }
-
-                        $leaveId = \App\Models\LeaveEmployeeRequest::create($arr);
-
-                        if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::SICK_LEAVE->value) {
-                            $record->leavePointLatest->update([
-                                'sl' => (float)$record->leavePointLatest?->sl - (float)$data['paid_days']
-                            ]);
-
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $startMonth,
-                                    'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
-                                    'hours' => "00",
-                                    'mins' => "00",
-                                    'w_pay' => $data['paid_days'],
-                                    'type' => "SL",
-                                    'remarks' => $data['remarks'],
-                                    'vl_balance' => $record->leavePointLatest?->vl,
-                                    'sl_balance' => $record->leavePointLatest?->sl,
-                                    'id_number' => $record->id_number
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $startMonth,
+                                        'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
+                                        'hours' => "00",
+                                        'mins' => "00",
+                                        'w_pay' => $data['paid_days'],
+                                        'type' => "VL",
+                                        'remarks' => $data['remarks'],
+                                        'vl_balance' => $record->leavePointLatest?->vl,
+                                        'sl_balance' => $record->leavePointLatest?->sl,
+                                        'id_number' => $record->id_number
+                                    ]);
+                            } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::SPECIAL_PRIVILEGE_LEAVE->value) {
+                                $record->leavePointLatest->update([
+                                    'spl' => (float)$record->leavePointLatest?->spl - (float)$data['paid_days']
                                 ]);
-                        } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::FORCE_LEAVE->value) {
-                            $record->leavePointLatest->update([
-                                'vl' => (float)$record->leavePointLatest?->vl - (float)$data['paid_days'],
-                                'fl' => (float)$record->leavePointLatest?->fl - (float)$data['paid_days'],
-                            ]);
 
 
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $startMonth,
-                                    'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
-                                    'hours' => "00",
-                                    'mins' => "00",
-                                    'w_pay' => $data['paid_days'],
-                                    'type' => "FL",
-                                    'remarks' => $data['remarks'],
-                                    'vl_balance' => $record->leavePointLatest?->vl,
-                                    'sl_balance' => $record->leavePointLatest?->sl,
-                                    'id_number' => $record->id_number
-                                ]);
-                        } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::VACATION_LEAVE->value) {
-                            $record->leavePointLatest->update([
-                                'vl' => (float)$record->leavePointLatest?->vl - (float)$data['paid_days']
-                            ]);
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $startMonth,
+                                        'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
+                                        'hours' => "00",
+                                        'mins' => "00",
+                                        'type' => "SPL",
+                                        'remarks' => $data['remarks'],
+                                        'vl_balance' => $record->leavePointLatest?->vl,
+                                        'sl_balance' => $record->leavePointLatest?->sl,
+                                        'id_number' => $record->id_number
+                                    ]);
+                            } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::OTHERS->value && $record->others == 'CTO') {
 
+                                $i = (int)$data['paid_days'];
+                                foreach ($record->employeeInfo?->leavePointLatestCto as $cto) {
 
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $startMonth,
-                                    'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
-                                    'hours' => "00",
-                                    'mins' => "00",
-                                    'w_pay' => $data['paid_days'],
-                                    'type' => "VL",
-                                    'remarks' => $data['remarks'],
-                                    'vl_balance' => $record->leavePointLatest?->vl,
-                                    'sl_balance' => $record->leavePointLatest?->sl,
-                                    'id_number' => $record->id_number
-                                ]);
-                        } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::SPECIAL_PRIVILEGE_LEAVE->value) {
-                            $record->leavePointLatest->update([
-                                'spl' => (float)$record->leavePointLatest?->spl - (float)$data['paid_days']
-                            ]);
+                                    if ($i > 0) {
 
+                                        if ((float)$cto->points > 0) {
+                                            while ($i > 0 && (float)$cto->points > 0) {
+                                                if ((float)$cto->points > 0) {
 
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $startMonth,
-                                    'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
-                                    'hours' => "00",
-                                    'mins' => "00",
-                                    'type' => "SPL",
-                                    'remarks' => $data['remarks'],
-                                    'vl_balance' => $record->leavePointLatest?->vl,
-                                    'sl_balance' => $record->leavePointLatest?->sl,
-                                    'id_number' => $record->id_number
-                                ]);
-                        } else if ($data['type_of_leave'] == \App\Enums\TypeOfLeaveEnum::OTHERS->value && $record->others == 'CTO') {
-
-                            $i = (int)$data['paid_days'];
-                            foreach ($record->employeeInfo?->leavePointLatestCto as $cto) {
-
-                                if ($i > 0) {
-
-                                    if ((float)$cto->points > 0) {
-                                        while ($i > 0 && (float)$cto->points > 0) {
-                                            if ((float)$cto->points > 0) {
-
-                                                $cto->update([
-                                                    'points' => (float)$cto->points - 1
-                                                ]);
+                                                    $cto->update([
+                                                        'points' => (float)$cto->points - 1
+                                                    ]);
+                                                }
+                                                $i--;
                                             }
-                                            $i--;
                                         }
                                     }
                                 }
+
+                                \App\Models\Leave\LeaveCard::query()
+                                    ->create([
+                                        'start_date' => $startMonth,
+                                        'w_pay' => $data['paid_days'],
+                                        'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
+                                        'hours' => "00",
+                                        'mins' => "00",
+                                        'type' => "CTO",
+                                        'remarks' => $data['remarks'],
+                                        'cto_balance' => $record->employeeInfo?->leavePointLatestCto->sum('points'),
+                                        'id_number' => $record->id_number
+                                    ]);
                             }
+                        }),
+                    Action::make('Leave Dashboard')
+                        ->label('LEAVE DASHBOARD')
+                        ->url(function ($record) {
+                            $slug = str_replace(' ', '_', $record->name);
+                            $slug = Str::upper($slug);
 
-                            \App\Models\Leave\LeaveCard::query()
-                                ->create([
-                                    'start_date' => $startMonth,
-                                    'w_pay' => $data['paid_days'],
-                                    'days' => str_pad($data['paid_days'], 2, '0', STR_PAD_LEFT),
-                                    'hours' => "00",
-                                    'mins' => "00",
-                                    'type' => "CTO",
-                                    'remarks' => $data['remarks'],
-                                    'cto_balance' => $record->employeeInfo?->leavePointLatestCto->sum('points'),
-                                    'id_number' => $record->id_number
-                                ]);
-                        }
-                    }),
-                Action::make('Leave Dashboard')
-                    ->url(function ($record) {
-                        $slug = str_replace(' ', '_', $record->name);
-                        $slug = Str::upper($slug);
-
-                        return route('leave.employees.view', ['employee_name' => $slug, 'employee_id' => $record->id_number]);
-                    })->icon('heroicon-o-computer-desktop')
+                            return route('leave.employees.view', ['employee_name' => $slug, 'employee_id' => $record->id_number]);
+                        })->icon('heroicon-o-computer-desktop')
+                ])
 
 
             ]);

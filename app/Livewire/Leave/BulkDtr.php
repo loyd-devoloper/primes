@@ -10,31 +10,34 @@ use Livewire\Component;
 
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use App\Models\Leave\LeaveBulkDtr;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Filters\Filter;
 
+use Filament\Tables\Filters\Filter;
 use Illuminate\Contracts\View\View;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
+
 use Filament\Forms\Contracts\HasForms;
-
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
 
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\DeleteAction;
+
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
 use Filament\Actions\Contracts\HasActions;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Filament\Tables\Concerns\InteractsWithTable;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use Coolsam\FilamentFlatpickr\Enums\FlatpickrTheme;
@@ -71,11 +74,10 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
         $arrival_am = [];
         $departure_am = [];
         $arrival_pm = [];
+        $increment = 1;
         $departure_pm = [];
-        $i = [];
         $iterationCount = 1;
         $x = 1;
-        $nameColumn = 13;
         if (!$this->file) {
             $this->dtrArr = [];
             return;
@@ -83,34 +85,36 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
         $spreadsheet = new Spreadsheet();
         $templatePath = storage_path('/app/livewire-tmp/' . $this->file);
         $reader = new Xlsx();
-
-
         $spreadsheet = $reader->load($templatePath);
         $sheet = $spreadsheet->getSheet(0);
 
-
-
         $this->month = Carbon::parse($sheet->getCell('D15')->getValue())->format('F Y');
-
-        // $days = $this->getAllDaysInMonth($month->format('Y'), $month->format('m'));
-
-
+        $iterationNew = 0;
+        $name = "";
         foreach ($sheet->getRowIterator() as $key => $row) {
 
-            if(  $sheet->getCell("A$key")->getValue() == 'In Charge')
-            {
-                dd( $sheet->getCell("A$key"),$key);
+            $cellA = $sheet->getCell("A$key");
+            if ($iterationNew === 0) {
+                $name = $sheet->getCell("A13")->getFormattedValue();
             }
+            // Check for "In Charge" header
+            if ($cellA->getValue() == 'In Charge') {
+
+                $iterationNew++;
+                $var = $key + 1;
+                $name = $sheet->getCell("A$var")->getFormattedValue();
+                $x = 1;
+                $increment++;
+            }
+
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(FALSE);
 
             if (gettype($sheet->getCell("A$key")->getValue()) == 'integer') {
+                # always run if meet the condition
                 $i[] = $key;
                 $iterationCount++;
-
                 $columnValue = $sheet->getCell("A$key")->getValue();
-
-
                 $date = Carbon::parse($sheet->getCell('D15')->getValue())->addDays((int)$columnValue - 1);
                 $this->globalMonth = Carbon::parse($sheet->getCell('D15')->getValue());
 
@@ -120,36 +124,27 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                 $arrival_pm["$x-$columnValue"] = $this->getColumnValue("D$key", $sheet, $date, false);
                 $departure_pm["$x-$columnValue"] = $this->getColumnValue("E$key", $sheet, $date, false);
 
-                // $arr["$x-$columnValue"]['date_arrival_am'] =  $arrival_am["$x-$columnValue"];
-                // $arr["$x-$columnValue"]['date_departure_am'] =  $departure_am["$x-$columnValue"];
-                // $arr["$x-$columnValue"]['date_arrival_pm'] =  $arrival_pm["$x-$columnValue"];
-                // $arr["$x-$columnValue"]['date_departure_pm'] =  $departure_pm["$x-$columnValue"];
-                // $arr[$sheet->getCell("A$nameColumn")->getValue()] = [];
-                $latestUser = LeaveBulkDtr::query()->max('id');
-                $increment = (int)$latestUser + 1;
-                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $sheet->getCell("A$nameColumn")->getFormattedValue()]['id_number'] = "";
-                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $sheet->getCell("A$nameColumn")->getFormattedValue()]['status'] = "PENDING";
-                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $sheet->getCell("A$nameColumn")->getFormattedValue()]['data']["$x-$columnValue"] = [
+
+
+                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['id_number'] = "";
+                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['status'] = "PENDING";
+                $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['data']["$x-$columnValue"] = [
                     'date_arrival_am' => $arrival_am["$x-$columnValue"],
                     'date_departure_am' => $departure_am["$x-$columnValue"],
                     'date_arrival_pm' => $arrival_pm["$x-$columnValue"],
                     'date_departure_pm' => $departure_pm["$x-$columnValue"],
                 ];
-                if ($iterationCount % 32 === 0) {
-                    // Add 20 to the iteration count
 
-                    $iterationCount = 1;
-                    $nameColumn += 52;
-                    $x++;
-                }
+                $x++;
             }
         }
+
         $late = '';
         $undertime = '';
         $type = 'Absent';
         $x = 1;
         $iterationCount = 1;
-        $nameColumn = 13;
+
         //        latest
         foreach ($arr as $key => $days) {
 
@@ -292,6 +287,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                 }
             }
         }
+        $increment = 0;
 
 
         $this->dtrArr = $arr;
@@ -422,23 +418,14 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
             ->action(fn() => dd('dsad'));
     }
 
-    public function updated($property, $value)
-    {
-        if ($property === 'selectupdateDtr') {
-            //            dd($value);
-        }
-    }
-
-    public function updateDtr($value, $id)
-    {
-        dd($value);
-    }
 
     public function table(Table $table): Table
     {
+        $query = LeaveBulkDtr::query()->orderBy('date', 'desc');
+
 
         return $table
-            ->query(\App\Models\Leave\LeaveBulkDtr::query()->orderByDesc('created_at'))
+            ->query($query)
             ->headerActions([
 
                 Action::make('dtr')
@@ -466,13 +453,21 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                     ->slideOver()
                     ->modalCancelAction(false)
                     ->action(function ($data, $record) {
-                        \App\Models\Leave\LeaveBulkDtr::query()->create([
-                            'id_number' => Auth::user()->id_number,
-                            'dtr' => json_encode($this->dtrArr),
-                            'date' => $this->month,
-                            'batch' => $data['batch'],
+                        $uuid = Str::uuid();
+                        foreach ($this->dtrArr as $key => $value) {
 
-                        ]);
+                            \App\Models\Leave\LeaveBulkDtr::query()->updateOrCreate([
+                                'user_name' => $key
+                            ], [
+                                'id_number' => Auth::user()->id_number,
+                                'dtr' => json_encode($value),
+                                'date' => Carbon::parse($this->month)->format('Y-m-d'),
+                                'batch' => $data['batch'],
+                                'group_id' => $uuid,
+                                'user_name' => $key
+                            ]);
+                        }
+                        $this->dtrArr = [];
                         Notification::make()
                             ->title('Success!')
                             ->body('The form has been submitted successfully.')
@@ -480,10 +475,12 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                             ->send();
                     })
             ])
-            ->columns([
-                TextColumn::make('date'),
-                TextColumn::make('batch'),
 
+            ->columns([
+                TextColumn::make('date')->sortable(['created_at']),
+                TextColumn::make('batch'),
+                TextColumn::make('user_name')->searchable(),
+TextColumn::make('employee.name')->searchable(),
             ])
             //            ->deferFilters()
             ->filters([
@@ -494,10 +491,11 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                             ->monthSelect()
                     ])
                     ->query(function ($query, array $data) {
+
                         return $query
                             ->when(
                                 $data['date'],
-                                fn($query, $date) => $query->whereDate('date', '=', $date),
+                                fn($query, $date) => $query->whereDate('date', Carbon::parse($date)),
                             );
                     })
                     ->indicateUsing(function (array $data) {
@@ -509,12 +507,14 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                     })
             ])
             ->actions([
-
+                DeleteAction::make('delete'),
                 ViewAction::make('information')
                     ->icon('heroicon-o-eye')
                     ->mutateRecordDataUsing(function ($data) {
-
-                        $this->dtrArrView = json_decode($data['dtr']);
+                        $this->employee = [
+                            'author_id'=>$data['id_number']
+                        ];
+                        $this->dtrArrView = $data;
                         return $data;
                     })
                     ->form([
@@ -549,11 +549,15 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
 
                             ]),
                     ])
-                    ->modalWidth(MaxWidth::Full)
+                    ->modalWidth(MaxWidth::FitContent)
                     ->slideOver()
-            ]);
+            ])->deferFilters();
     }
-
+    public function updateDtr($data, $model)
+    {
+        LeaveBulkDtr::findOrFail($model['id'])->update(['id_number' => $data]);
+    }
+    public $employee = [];
     public function form(Form $form): Form
     {
         return $form
@@ -564,7 +568,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                     ->searchable()
                     ->native(false)
                     ->extraAlpineAttributes(['x-on:change' => 'updateDtr($event.target.value,model)'])
-            ]);
+            ])->statePath('employee');
     }
 
     function getAllDaysInMonth($year, $month)

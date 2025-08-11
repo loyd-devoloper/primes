@@ -27,6 +27,7 @@ class LeaveCard extends Component implements HasActions,HasForms
                                     ->where('id_number',$this->employeeid)
                                     ->orderBy('start_date','asc')
                                     ->get();
+
     }
      // Leave Card
      public function slideOverLeaveCardAction()

@@ -50,7 +50,7 @@
                 
 
                 <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $leaveData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $leave): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <!--[if BLOCK]><![endif]--><?php if($leave->start_date < \Carbon\Carbon::now()): ?>
+
                     <tr>
                         <td class="border border-black dark:border-white" style=" padding: 8px;text-align: center">
                             <?php echo e($leave->period); ?></td>
@@ -103,12 +103,12 @@
                         </td>
                         <td class="border border-black dark:border-white" style=" padding: 8px;text-align: center">
                             <?php echo e($leave->type == 'CTO' ? $leave?->w_o_pay : ''); ?></td>
-                        <td class="border border-black dark:border-white"
+                        <td class="border border-black dark:border-white break-words"
                             style=" padding: 0px;max-width: 4rem;text-align: center">
                             <p style=""><?php echo e($leave?->remarks); ?></p>
                         </td>
                     </tr>
-                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
             </tbody>
