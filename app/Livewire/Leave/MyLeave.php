@@ -5,12 +5,10 @@ namespace App\Livewire\Leave;
 use Carbon\Carbon;
 use App\Models\User;
 use \App\Traits\Leave\LeaveRequestTrait;
-use Livewire\Livewire;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+
 use Livewire\Component;
 use Carbon\CarbonPeriod;
-use App\Models\OfficeCode;
+
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -239,10 +237,12 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
             ->headerActions([
                 // forms => Leave Request Trait
                 CreateAction::make('Request Leave')
+                   ->disabled(fn() => Carbon::now()->subMonth()->format('F Y') !== $this->leaves?->current_month)
                     ->label('Request Leave')
                     ->icon('heroicon-o-plus')
                     ->slideOver()
                     ->form(function () use ($availableFd) {
+                        dd(Carbon::now()->subMonth()->format('F Y') === $this->leaves?->current_month);
                         return $this->leaveRequestFormStore($availableFd);
                     })
                     ->createAnother(false)

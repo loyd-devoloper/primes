@@ -32,7 +32,9 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Coolsam\FilamentFlatpickr\Enums\FlatpickrTheme;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
 
 
@@ -235,23 +237,27 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('sl')->label('Sick Leave (SL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->sl)->default($this->leaves?->sl),
                 TextInput::make('vl')->label('Vacation Leave (VL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->vl)->default($this->leaves?->vl),
                 TextInput::make('fl')->label('Force Leave (FL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->fl)->default($this->leaves?->fl),
-                TextInput::make('spl')->label('Special Privilege Leave(SPL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->spl)->default($this->leaves?->spl),
-                Select::make('current_month')
-                    ->label('Month')
-                    ->options([
-                        'January' => 'January',
-                        'Febuary' => 'Febuary',
-                        'March' => 'March',
-                        'April' => 'April',
-                        'May' => 'May',
-                        'June' => 'June',
-                        'July' => 'July',
-                        'August' => 'August',
-                        'September' => 'September',
-                        'October' => 'October',
-                        'November' => 'November',
-                        'December' => 'December',
-                    ])->required()->default($this->leaves?->current_month),
+                TextInput::make(name: 'spl')->label('Special Privilege Leave(SPL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->spl)->default($this->leaves?->spl),
+                // Select::make('current_month')
+                //     ->label('Month')
+                //     ->options([
+                //         'January' => 'January',
+                //         'Febuary' => 'Febuary',
+                //         'March' => 'March',
+                //         'April' => 'April',
+                //         'May' => 'May',
+                //         'June' => 'June',
+                //         'July' => 'July',
+                //         'August' => 'August',
+                //         'September' => 'September',
+                //         'October' => 'October',
+                //         'November' => 'November',
+                //         'December' => 'December',
+                //     ])->required()->default($this->leaves?->current_month),
+                  Flatpickr::make('current_month')
+                  ->label('Month')
+                            ->theme(FlatpickrTheme::DARK)
+                            ->monthSelect()
 
 
             ])
@@ -263,7 +269,7 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
                     "vl" => $data["vl"],
                     "fl" => $data["fl"],
                     "spl" => $data["spl"],
-                    "current_month" => $data["current_month"],
+                    "current_month" => Carbon::parse($data["current_month"])->format('F Y'),
                     'status'=>0
 
                 ]);

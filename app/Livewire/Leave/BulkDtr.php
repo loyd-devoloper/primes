@@ -203,6 +203,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
 
                     $difference = $arrival_start->diff($departure_start);
                     $time = sprintf('%02d:%02d', $difference->h - 1, $difference->i);
+
                     $carbonTime = Carbon::createFromFormat('H:i', $time);
                     // Create a Carbon instance for 8:00:00
                     $eightHours = Carbon::createFromFormat('H:i', '08:00');
@@ -215,7 +216,32 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                         $type = 'L/UT';
                         $undertime = $differenceTime->h * 60 + $differenceTime->i;
                     }
-                } elseif ($arrival_start == '' && !!$arrival_end && $departure_start == '' && !!$departure_end) {
+                }
+
+                elseif (!!$arrival_start && !!$arrival_end && $departure_start == '' && $departure_end == '') {
+
+                    // $type = 'UT';
+                    $max_time = $this->minDate($event);
+                    $late = $this->estimateLate($arrival_start, $max_time);
+
+                    $difference = $arrival_start->diff($arrival_end);
+                    $time = sprintf('%02d:%02d', $difference->h, $difference->i);
+
+                    $carbonTime = Carbon::createFromFormat('H:i', $time);
+                    // Create a Carbon instance for 8:00:00
+                    $eightHours = Carbon::createFromFormat('H:i', '04:00');
+                    // Check if the given time is greater than 4 hours
+                    if ($carbonTime > $eightHours) {
+                        $undertime = 0;
+                        $type = 'Halfday';
+                    } else {
+                        $differenceTime = $eightHours->diff($carbonTime);
+                        $type = 'L/UT';
+                        $undertime = $differenceTime->h * 60 + $differenceTime->i;
+                    }
+
+                }
+                elseif ($arrival_start == '' && !!$arrival_end && $departure_start == '' && !!$departure_end) {
                     $type = 'UT';
                     $difference = $arrival_end->diff($departure_end);
                     $undertime = $this->estimateUndertime($difference);
@@ -459,7 +485,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                             \App\Models\Leave\LeaveBulkDtr::query()->updateOrCreate([
                                 'user_name' => $key
                             ], [
-                                'id_number' => Auth::user()->id_number,
+
                                 'dtr' => json_encode($value),
                                 'date' => Carbon::parse($this->month)->format('Y-m-d'),
                                 'batch' => $data['batch'],
@@ -480,7 +506,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                 TextColumn::make('date')->sortable(['created_at']),
                 TextColumn::make('batch'),
                 TextColumn::make('user_name')->searchable(),
-TextColumn::make('employee.name')->searchable(),
+                TextColumn::make('employee.name')->searchable(),
             ])
             //            ->deferFilters()
             ->filters([
@@ -512,7 +538,7 @@ TextColumn::make('employee.name')->searchable(),
                     ->icon('heroicon-o-eye')
                     ->mutateRecordDataUsing(function ($data) {
                         $this->employee = [
-                            'author_id'=>$data['id_number']
+                            'author_id' => $data['id_number']
                         ];
                         $this->dtrArrView = $data;
                         return $data;

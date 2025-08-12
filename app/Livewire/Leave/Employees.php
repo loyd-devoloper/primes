@@ -577,7 +577,7 @@ class Employees extends Component  implements HasForms, HasTable
                                         'id_number' => $record->id_number
                                     ]);
                                          $record?->leavePointLatest->update([
-                                    'current_month' => $newCurrentMonth->format('F'),
+                                    'current_month' => $newCurrentMonth->format('F Y'),
                                     'vl' => (float)$record->leavePointLatest?->vl + (float)$data['sl_earn'],
                                     'sl' => (float)$record->leavePointLatest?->sl + (float)$data['sl_earn'],
                                 ]);

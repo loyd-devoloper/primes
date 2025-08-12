@@ -9,7 +9,7 @@
 </head>
 
 <body style="margin: 0%;padding:0%;font-size:.6rem;position: relative">
-    <div style="padding-bottom: .8rem;">
+    <div style="padding-bottom: .8rem;font-size:.5rem">
         <h1 style="position: absolute; transform: rotate(45deg); font-family: 'Monaco', monospace; font-size: 3.25rem; top: 12rem; font-weight: 800; right: 30%; opacity: 0.1;">PERSONNEL SECTION</h1>
         <p
             style="text-align: center; text-decoration: underline;font-size:1.2rem;font-weight:600;font-family:sans-serif">
@@ -58,7 +58,7 @@
         </thead>
         <tbody>
             <?php $__currentLoopData = $leaveData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $leave): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php if($leave->start_date < \Carbon\Carbon::now()): ?>
+                
                     <tr>
                         <td style="border: 1px solid black; padding: 8px;text-align: center"><?php echo e($leave->period); ?></td>
                         <td style="border: 1px solid black; padding: 8px;text-align: center">
@@ -90,7 +90,7 @@
                             <p style=""><?php echo e($leave?->remarks); ?></p>
                         </td>
                     </tr>
-                <?php endif; ?>
+                
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
     </table>
