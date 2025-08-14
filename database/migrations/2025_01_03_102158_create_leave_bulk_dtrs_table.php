@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('leave_bulk_dtrs', function (Blueprint $table) {
             $table->id();
             $table->string('batch');
-            $table->string('id_number');
+            $table->string('id_number')->nullable();
             $table->json('dtr');
-            $table->uuid('group_id');
+            $table->string('group_id');
             $table->string('user_name');
             $table->string('date');
 

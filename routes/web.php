@@ -9,16 +9,12 @@ use App\Livewire\ID\Template;
 use App\Livewire\ID\Dashboard;
 use App\Livewire\Personnel\Home;
 use App\Livewire\Recruitment\Job;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+
 use App\Livewire\CAD\Home as CADHome;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\EmployeeProfile;
 use App\Livewire\Auth\ValidateEmployee;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\ExportController;
@@ -26,12 +22,10 @@ use App\Http\Controllers\ExportController;
 use App\Livewire\Recruitment\AllApplicant;
 use App\Livewire\Recruitment\Applications;
 use App\Livewire\PersonalDataSheet\OtherInfo;
-use App\Livewire\Recruitment\Step1\CheckFile;
 use App\Livewire\Recruitment\ApplicationTable;
 use App\Livewire\PersonalDataSheet\Association;
 use App\Livewire\PersonalDataSheet\Distinction;
 use App\Livewire\PersonalDataSheet\Eligibility;
-use App\Mail\Recruitment\CheckFileNotification;
 use App\Livewire\PersonalDataSheet\SkillsHobbies;
 use App\Livewire\PersonalDataSheet\WorkExperience;
 use App\Livewire\PersonalDataSheet\FamilyBackground;
@@ -39,11 +33,6 @@ use App\Livewire\PersonalDataSheet\LearningDevelopment;
 use App\Livewire\PersonalDataSheet\PersonalInformation;
 use App\Livewire\PersonalDataSheet\EducationalBackground;
 use App\Livewire\PersonalDataSheet\AffiliationInvolvement;
-use App\Livewire\Recruitment\Step1\CheckFile\CheckFileView;
-use App\Livewire\Recruitment\Step1\CheckFile\CheckFileTable;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Spatie\Permission\Middleware\PermissionMiddleware;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -139,6 +128,7 @@ Route::prefix('personnel')->group(function () {
         Route::get('all_request', \App\Livewire\Leave\AllRequest::class)->name('leave.all_request');
         Route::get('my_leave', \App\Livewire\Leave\MyLeave::class)->name('leave.my_leave');
         Route::get('employees', \App\Livewire\Leave\Employees::class)->name('leave.employees');
+         Route::get('employees-dtr/{dtr_group}', \App\Livewire\Leave\BulkDtrView::class)->name('leave.employees.dtr');
         Route::get('employees/{employee_name}/{employee_id}', \App\Livewire\Leave\EmployeesView::class)->name('leave.employees.view');
         Route::get('Request/{title}/{request_id}', \App\Livewire\Leave\RequestView::class)->name('leave.request.view');
 

@@ -16,4 +16,6 @@ class LeaveBulkDtr extends Model
     {
         return $this->hasOne(User::class,'id_number','id_number');
     }
+
+
 }

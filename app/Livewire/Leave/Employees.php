@@ -562,7 +562,6 @@ class Employees extends Component  implements HasForms, HasTable
                                     ]);
 
 
-
                                 \App\Models\Leave\LeaveCard::query()
                                     ->create([
                                         'start_date' => $newCurrentMonth->firstOfMonth(),

@@ -30,7 +30,8 @@ class User extends Authenticatable
         'fd_code',
         'user_type',
         'id_number',
-        'status'
+        'status',
+        'dtr_key'
 
     ];
     // ############################### Leave  ################################################
