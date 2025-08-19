@@ -118,16 +118,16 @@
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_departure_am"></td>
+                                        x-text="date.date_departure_am.time"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_arrival_pm">
+                                        x-text="date.date_arrival_pm.time">
                                     </td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_departure_pm"></td>
+                                        x-text="date.date_departure_pm.time"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
@@ -140,10 +140,7 @@
                                         x-text="convertUndertime('m',date)">
 
                                     </td>
-                                    <td class="whitespace-nowrap"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
-                                            'hidden' : ''"
-                                        x-text="decrease(date)"></td>
+
                                 </tr>
                             </template>
                             <div>
@@ -261,7 +258,7 @@
                 } else if (date.type == 'Absent') {
                     return date.type;
                 } else {
-                    return date.date_arrival_am;
+                    return date.date_arrival_am.time;
                 }
 
             },

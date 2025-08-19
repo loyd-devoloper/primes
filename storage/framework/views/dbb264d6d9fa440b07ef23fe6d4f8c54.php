@@ -1,32 +1,65 @@
-@assets
+    <?php
+        $__assetKey = '3745223423-0';
+
+        ob_start();
+    ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="{{ asset('canva.js') }}"></script>
-@endassets
+    <script src="<?php echo e(asset('canva.js')); ?>"></script>
+    <?php
+        $__output = ob_get_clean();
+
+        // If the asset has already been loaded anywhere during this request, skip it...
+        if (in_array($__assetKey, \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys)) {
+            // Skip it...
+        } else {
+            \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $__assetKey;
+            \Livewire\store($this)->push('assets', $__output, $__assetKey);
+        }
+    ?>
 <div>
 
     <main x-data="skillDisplay">
-        {{--        <button  class="bg-gray-500 px-6 py-2">Generate PDF</button> --}}
+        
         <section >
             <div>
 
-                    <x-filament::icon-button icon="heroicon-m-printer" label="Print" color="secondary" type="button"
-                        x-on:click="generateMe()" />
-                    {{-- Content --}}
-                    <div x-data="{ model: @js($dtrData) }" class="max-w-[15rem] px-1 mb-2">
-                        {{ $this->form }}
+                    <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','xOn:click' => 'generateMe()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','x-on:click' => 'generateMe()']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $attributes = $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+                    
+                    <div x-data="{ model: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class="max-w-[15rem] px-1 mb-2">
+                        <?php echo e($this->form); ?>
+
                     </div>
                     <div :id="'table'"
                         class="block w-fit  overflow-x-auto   mx-auto text-xs relative ">
 
 
                         <div class=" ">
-                            {{-- <img src="{{ $qrcode }}" id="qr_code_b" class="absolute  w-[3rem] top-0 right-2" alt=""> --}}
-                            <img src="{{ asset('/assets/dtr_image.png') }}" class="max-w-[29rem] " alt="">
+                            
+                            <img src="<?php echo e(asset('/assets/dtr_image.png')); ?>" class="max-w-[50rem] " alt="">
                             <p class="py-2 "><i>Civil Service Form No. 48</i></p>
                             <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
                             <p class="text-center ">-----o0o-----</p>
                             <p class="border-b border-black text-center font-bold mt-4">
-                                {{ explode('--', $dtrData['user_name'])[1] }}</p>
+                                <?php echo e(explode('--', $dtrData['user_name'])[1]); ?></p>
                             <h6 class="text-center text-xs">(Name)</h6>
                             <div class="grid grid-cols-5 pt-5">
                                 <div class="col-span-2 px-3">
@@ -36,7 +69,8 @@
                                 </div>
                                 <div class="col-span-3">
                                     <p class="border-b border-black text-center font-bold uppercase">
-                                        {{ \Carbon\Carbon::parse($dtrData['date'])->format('F Y') }}
+                                        <?php echo e(\Carbon\Carbon::parse($dtrData['date'])->format('F Y')); ?>
+
                                     </p>
                                     <div class="grid grid-cols-2 py-1">
                                         <p class="text-center">Regular days</p>
@@ -48,8 +82,8 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- Content --}}
-                            <div x-data="{ employee: @js($dtrData) }" class=" max-w-[29rem]  h-full pt-10">
+                            
+                            <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class=" max-w-[50rem]  h-full pt-10">
                                 <table class="border-collapse w-full ">
                                     <tr class="">
                                         <td class="border border-black border-solid px-2.5 text-center" rowspan="2">
@@ -81,32 +115,27 @@
                                             Minutes</td>
                                     </tr>
 
-                                    @foreach (json_decode($dtrData['dtr'], true)['data'] as $dateKey => $date)
-                                        <tr x-data="{ date: @js($date) }">
+                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtrData['dtr'], true)['data']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr x-data="{ date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?> }">
                                             <td
                                                 class="border-l border-b border-black border-solid px-2.5 py-1  font-bold text-center whitespace-nowrap">
-                                                {{ explode('-', $dateKey)[1] }}
+                                                <?php echo e(explode('-', $dateKey)[1]); ?>
+
                                             </td>
 
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_arrival_am'])
-                                                    <td class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap"
-                                                        :class="{
-                                                            'font-bold border-r': shouldHighlightCell(date)
-                                                        }"
-                                                        :colspan="getCellColspan(date)" x-text="convertDate(date)">
-                                                    </td>
-                                                @else
+                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_am']['editable'])): ?>
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+
+                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-1" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
-                                            @else
+
+                                            <?php else: ?>
                                                 <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                     :class="{
                                                         'font-bold border-r': date.type === 'Absent' || typeof(
@@ -115,70 +144,57 @@
                                                     }"
                                                     :colspan="typeof(date) === 'string' || date.type == 'travel' ? 6 : 1"
                                                     x-text="convertDate(date)"></td>
-                                            @endif
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
 
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_departure_am'])
-                                                      <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_am"></td>
-                                                @else
+                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_am']['editable'])): ?>
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-2" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
-                                            @else
+
+                                            <?php else: ?>
                                                   <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_am"></td>
-                                            @endif
+                                                x-text="date.date_departure_am.time"></td>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_arrival_pm'])
-                                                     <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_arrival_pm">
-                                            </td>
-                                                @else
+                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_pm']['editable'])): ?>
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-3" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
-                                            @else
+
+                                            <?php else: ?>
                                                  <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_arrival_pm">
+                                                x-text="date.date_arrival_pm.time">
                                             </td>
-                                            @endif
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_departure_pm'])
-                                                  <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_pm"></td>
-                                                @else
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_pm']['editable'])): ?>
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text"  wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-4" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
-                                            @else
+
+                                            <?php else: ?>
                                                <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_pm"></td>
-                                            @endif
+                                                x-text="date.date_departure_pm.time"></td>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                                             <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
@@ -190,29 +206,13 @@
                                                 x-text="convertUndertime('m',date)">
 
                                             </td>
-                                            {{-- <td class="whitespace-nowrap"
-                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
-                                            'hidden' : ''"
-                                        x-text="decrease(date)"></td> --}}
+                                            
                                         </tr>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
                                 </table>
                             </div>
-                            <div class="max-w-[29rem] ">
-                                <p class="pb-12 pt-5">I certify on my honor that the above is a true and correct report
-                                    of the
-                                    hours
-                                    of work performed, record of which was made daily at the time of arrival and
-                                    departure from
-                                    office.</p>
 
-                                <div class="border-b border-black border-solid"></div>
-
-                                <p class="pt-5 pb-12">VERIFIED as to the prescribed office hours:</p>
-                                <div class="border-b border-black border-solid"></div>
-                                <p class="text-center">in charge</p>
-                            </div>
 
                         </div>
 
@@ -223,7 +223,10 @@
     </main>
 
 </div>
-@script
+    <?php
+        $__scriptKey = '3745223423-1';
+        ob_start();
+    ?>
     <script>
         Alpine.data('skillDisplay', () => ({
             aside: true,
@@ -296,12 +299,14 @@
                 return `${x} minutes`;
             },
             convertDate(date) {
+
                 if (typeof(date) === 'string') {
                     return date;
                 } else if (date.type == 'Absent') {
-                    // return date.type;
+
+                     return date.date_arrival_am.time;
                 } else {
-                    return date.date_arrival_am;
+                    return date.date_arrival_am.time;
                 }
 
             },
@@ -370,4 +375,9 @@
 
         }));
     </script>
-@endscript
+    <?php
+        $__output = ob_get_clean();
+
+        \Livewire\store($this)->push('scripts', $__output, $__scriptKey)
+    ?>
+<?php /**PATH /home/loyd-deped/Desktop/www/PDS/resources/views/livewire/leave/my/dtr_edit_employee.blade.php ENDPATH**/ ?>

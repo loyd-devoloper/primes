@@ -55,14 +55,14 @@
                                         x-text="convertDate(date)"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_am"></td>
+                                        x-text="date.date_departure_am.time"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_arrival_pm">
+                                        x-text="date.date_arrival_pm.time">
                                     </td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_pm"></td>
+                                        x-text="date.date_departure_pm.time"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
                                         x-text="convertUndertime('h',date)">
@@ -124,7 +124,7 @@
         },
         decrease(date) {
 
-            if (date.late > 0 && date.type == 'Full') {
+            if (date.late > 0) {
                 // this.total += parseInt(date.late)
 
                 return 'L = ' + date.late;
@@ -133,7 +133,7 @@
         },
         totalPerEmployee(employee) {
             var x = 0;
-            console.log(employee)
+
             Object.entries(employee).forEach(([key, value]) => {
                 if (typeof (value) !== 'string') {
 
@@ -168,7 +168,7 @@
             } else if (date.type == 'Absent') {
                 return date.type;
             } else {
-                return date.date_arrival_am;
+                return date.date_arrival_am.time;
             }
 
         },

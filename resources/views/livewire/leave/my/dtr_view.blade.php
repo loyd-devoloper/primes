@@ -7,13 +7,11 @@
 
 
 
-                    {{ ($getAction('dtr'))([1 => $this->dtrArrView]) }}
-                    <div x-data="{model: @js($this->dtrArrView)}">
-                        {{$this->form}}
-                    </div>
+                    {{ ($getAction('dtr'))([1 => $dtrArrView]) }}
+
 
                     {{-- Content --}}
-                    <div x-data="{employee: @js(json_decode($this->dtrArrView['dtr'])->data)}">
+                    <div x-data="{employee: @js(json_decode($dtrArrView['dtr'])->data)}">
                         <table>
                             <tr>
                                 <td class="border px-2.5 text-center" rowspan="2">Days</td>
@@ -30,7 +28,7 @@
                                 <td class="border px-2.5 text-center">Minutes</td>
                             </tr>
 
-                            @foreach(json_decode($this->dtrArrView['dtr'])->data as $dateKey => $date)
+                            @foreach(json_decode($dtrArrView['dtr'])->data as $dateKey => $date)
 
                                 <tr x-data="{date: @js($date)}">
                                     <td class="border px-2.5 font-bold text-center"
@@ -52,14 +50,14 @@
                                         x-text="convertDate(date)"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_am.time"></td>
+                                        x-text="date.date_departure_am"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_arrival_pm.time">
+                                        x-text="date.date_arrival_pm">
                                     </td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_pm.time"></td>
+                                        x-text="date.date_departure_pm"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
                                         x-text="convertUndertime('h',date)">
@@ -118,7 +116,7 @@
         },
         decrease(date) {
 
-            if (date.late > 0) {
+            if (date.late > 0 && date.type == 'Full') {
                 // this.total += parseInt(date.late)
 
                 return 'L = ' + date.late;
@@ -127,7 +125,7 @@
         },
         totalPerEmployee(employee) {
             var x = 0;
-
+            console.log(employee)
             Object.entries(employee).forEach(([key, value]) => {
                 if (typeof (value) !== 'string') {
 
@@ -162,7 +160,7 @@
             } else if (date.type == 'Absent') {
                 return date.type;
             } else {
-                return date.date_arrival_am.time;
+                return date.date_arrival_am;
             }
 
         },

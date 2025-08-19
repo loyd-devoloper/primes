@@ -157,10 +157,22 @@ trait PersonnelLeaveTrait
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['id_number'] = "";
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['status'] = "PENDING";
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['data']["$x-$columnValue"] = [
-                    'date_arrival_am' => $arrival_am["$x-$columnValue"],
-                    'date_departure_am' => $departure_am["$x-$columnValue"],
-                    'date_arrival_pm' => $arrival_pm["$x-$columnValue"],
-                    'date_departure_pm' => $departure_pm["$x-$columnValue"],
+                    'date_arrival_am' => [
+                        'time' => $arrival_am["$x-$columnValue"],
+                        'editable' => $arrival_am["$x-$columnValue"] ? false : true
+                    ],
+                    'date_departure_am' => [
+                        'time' => $departure_am["$x-$columnValue"],
+                        'editable' => $departure_am["$x-$columnValue"] ? false : true
+                    ],
+                    'date_arrival_pm' => [
+                        'time' => $arrival_pm["$x-$columnValue"],
+                        "editable" => $arrival_pm["$x-$columnValue"] ? false : true
+                    ],
+                    'date_departure_pm' => [
+                        'time' => $departure_pm["$x-$columnValue"],
+                        'editable' => $departure_pm["$x-$columnValue"] ? false : true
+                    ],
                 ];
 
                 $x++;
@@ -185,25 +197,26 @@ trait PersonnelLeaveTrait
                 $departure_start = '';
                 $departure_end = '';
                 $editable = true;
-                if (!!$day['date_arrival_am']) {
-                    $arrival_start = str_contains($day['date_arrival_am'], 'TRAVEL') ? $day['date_arrival_am'] : Carbon::parse($day['date_arrival_am']);
+
+                if (!!$day['date_arrival_am']['time']) {
+                    $arrival_start = str_contains($day['date_arrival_am']['time'], 'TRAVEL') ? $day['date_arrival_am']['time'] : Carbon::parse($day['date_arrival_am']['time']);
                 }
 
-                if (!!$day['date_departure_am']) {
-                    $departure_start = str_contains($day['date_departure_am'], 'TRAVEL') ? $day['date_departure_am'] : Carbon::parse($day['date_departure_am']);
+                if (!!$day['date_departure_am']['time']) {
+                    $departure_start = str_contains($day['date_departure_am']['time'], 'TRAVEL') ? $day['date_departure_am']['time'] : Carbon::parse($day['date_departure_am']['time']);
                 }
 
-                if (!!$day['date_arrival_pm']) {
-                    $arrival_end = str_contains($day['date_arrival_pm'], 'TRAVEL') ? $day['date_arrival_pm'] : Carbon::parse($day['date_arrival_pm']);
+                if (!!$day['date_arrival_pm']['time']) {
+                    $arrival_end = str_contains($day['date_arrival_pm']['time'], 'TRAVEL') ? $day['date_arrival_pm']['time'] : Carbon::parse($day['date_arrival_pm']['time']);
                 }
-                if (!!$day['date_departure_pm']) {
-                    $departure_end = str_contains($day['date_departure_pm'], 'TRAVEL') ? $day['date_departure_pm'] : Carbon::parse($day['date_departure_pm']);
+                if (!!$day['date_departure_pm']['time']) {
+                    $departure_end = str_contains($day['date_departure_pm']['time'], 'TRAVEL') ? $day['date_departure_pm']['time'] : Carbon::parse($day['date_departure_pm']['time']);
                 }
 
                 // check event
                 $event = \App\Models\Leave\LeaveCalendar::query()->whereDate('start', $date)->first();
                 $fc = $event?->type == '1' ? true : false;
-                if (str_contains($day['date_arrival_am'], 'TRAVEL')) {
+                if (str_contains($day['date_arrival_am']['time'], 'TRAVEL')) {
                     $type = 'travel';
                     $editable = false;
                 }
@@ -304,7 +317,7 @@ trait PersonnelLeaveTrait
                     [$editable, $type, $undertime, $late, $difference] =  $this->loadDtrCondition($arrival_start, $arrival_end, $event, $departure_start, $arrival_end, $fc);
                 }
 
-  if (!!$arrival_start && !!$departure_start && $arrival_end == '' &&  $departure_end == '') {
+                if (!!$arrival_start && !!$departure_start && $arrival_end == '' &&  $departure_end == '') {
 
                     [$editable, $type, $undertime, $late, $difference] =  $this->loadDtrCondition($arrival_start, $departure_start, $event, $departure_start, $departure_start, $fc);
                 }

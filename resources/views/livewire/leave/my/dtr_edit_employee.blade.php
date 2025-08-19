@@ -21,7 +21,7 @@
 
                         <div class=" ">
                             {{-- <img src="{{ $qrcode }}" id="qr_code_b" class="absolute  w-[3rem] top-0 right-2" alt=""> --}}
-                            <img src="{{ asset('/assets/dtr_image.png') }}" class="max-w-[29rem] " alt="">
+                            <img src="{{ asset('/assets/dtr_image.png') }}" class="max-w-[50rem] " alt="">
                             <p class="py-2 "><i>Civil Service Form No. 48</i></p>
                             <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
                             <p class="text-center ">-----o0o-----</p>
@@ -49,7 +49,7 @@
                                 </div>
                             </div>
                             {{-- Content --}}
-                            <div x-data="{ employee: @js($dtrData) }" class=" max-w-[29rem]  h-full pt-10">
+                            <div x-data="{ employee: @js($dtrData) }" class=" max-w-[50rem]  h-full pt-10">
                                 <table class="border-collapse w-full ">
                                     <tr class="">
                                         <td class="border border-black border-solid px-2.5 text-center" rowspan="2">
@@ -89,23 +89,17 @@
                                             </td>
 
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_arrival_am'])
-                                                    <td class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap"
-                                                        :class="{
-                                                            'font-bold border-r': shouldHighlightCell(date)
-                                                        }"
-                                                        :colspan="getCellColspan(date)" x-text="convertDate(date)">
-                                                    </td>
-                                                @else
+                                            @if (!empty($date['date_arrival_am']['editable']))
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+
+                                                            <input type="text" wire:model="name.{{ explode('-',$dateKey)[0] }}-1" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
+
                                             @else
                                                 <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                     :class="{
@@ -119,65 +113,52 @@
 
 
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_departure_am'])
-                                                      <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_am"></td>
-                                                @else
+                                            @if (!empty($date['date_departure_am']['editable']))
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text" wire:model="name.{{ explode('-',$dateKey)[0] }}-2" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
+
                                             @else
                                                   <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_am"></td>
+                                                x-text="date.date_departure_am.time"></td>
                                             @endif
 
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_arrival_pm'])
-                                                     <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_arrival_pm">
-                                            </td>
-                                                @else
+                                            @if (!empty($date['date_arrival_pm']['editable']))
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text" wire:model="name.{{ explode('-',$dateKey)[0] }}-3" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
+
                                             @else
                                                  <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_arrival_pm">
+                                                x-text="date.date_arrival_pm.time">
                                             </td>
                                             @endif
-                                            @if (!empty($date['editable']))
-                                                @if (!!$date['date_departure_pm'])
-                                                  <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_pm"></td>
-                                                @else
+                                            @if (!empty($date['date_departure_pm']['editable']))
+
                                                     <!-- Editable Mode -->
                                                     <td
                                                         class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-                                                        <x-filament::input.wrapper  class="text-2xl">
-                                                            <x-filament::input type="text" wire:model="name" class="!text-2xl !important" />
-                                                        </x-filament::input.wrapper>
+
+                                                            <input type="text"  wire:model="name.{{ explode('-',$dateKey)[0] }}-4" class="!text-xs max-w-[5rem] !important" />
+
                                                     </td>
-                                                @endif
+
                                             @else
                                                <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_pm"></td>
+                                                x-text="date.date_departure_pm.time"></td>
                                             @endif
 
                                             <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
@@ -199,20 +180,7 @@
 
                                 </table>
                             </div>
-                            <div class="max-w-[29rem] ">
-                                <p class="pb-12 pt-5">I certify on my honor that the above is a true and correct report
-                                    of the
-                                    hours
-                                    of work performed, record of which was made daily at the time of arrival and
-                                    departure from
-                                    office.</p>
 
-                                <div class="border-b border-black border-solid"></div>
-
-                                <p class="pt-5 pb-12">VERIFIED as to the prescribed office hours:</p>
-                                <div class="border-b border-black border-solid"></div>
-                                <p class="text-center">in charge</p>
-                            </div>
 
                         </div>
 
@@ -296,12 +264,14 @@
                 return `${x} minutes`;
             },
             convertDate(date) {
+
                 if (typeof(date) === 'string') {
                     return date;
                 } else if (date.type == 'Absent') {
-                    // return date.type;
+
+                     return date.date_arrival_am.time;
                 } else {
-                    return date.date_arrival_am;
+                    return date.date_arrival_am.time;
                 }
 
             },

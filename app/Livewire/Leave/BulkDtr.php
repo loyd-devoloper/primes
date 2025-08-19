@@ -95,6 +95,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                     ->slideOver()
                     ->modalCancelAction(false)
                     ->action(function ($data, $record) {
+
                         $uuid = LeaveBulkDtrGroup::query()->create([
                             'name'=>$data['batch']
                         ]);
@@ -109,6 +110,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                                 'user_name' => $key
                             ]);
                         }
+
                         $this->dtrArr = [];
                         Notification::make()
                             ->title('Success!')

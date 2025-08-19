@@ -4,13 +4,13 @@ namespace App\Livewire\Leave;
 
 use Carbon\Carbon;
 use App\Models\User;
-use \App\Traits\Leave\LeaveRequestTrait;
-
 use Livewire\Component;
-use Carbon\CarbonPeriod;
 
+use Carbon\CarbonPeriod;
 use Filament\Tables\Table;
+
 use Illuminate\Support\Str;
+use Livewire\Attributes\Url;
 
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
@@ -24,6 +24,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use \App\Traits\Leave\LeaveRequestTrait;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
@@ -42,7 +43,8 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
     use InteractsWithActions;
     use AttachmentTrait;
     use LeaveRequestTrait;
-
+    #[Url()]
+    public $tab =  'LEAVE-REQUEST';
     public $leaves = null;
     public $leaveCto = 0;
     public $paid = 0;
@@ -70,6 +72,15 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
         $this->dtrData = \App\Models\Leave\LeaveBulkDtr::query()->where('id_number', Auth::user()->id_number)->latest()->get();
 
         $this->minDates = Carbon::now()->format('Y-m-d');
+    }
+
+    public function changeTab($tab)
+    {
+
+        $this->resetPage();
+        $this->deselectAllTableRecords();
+        // $tab == 'LEAVE-REQUEST' ? sleep(1) : '';
+        $this->tab = $tab;
     }
 
     public function modalFormAction(): \Filament\Actions\Action

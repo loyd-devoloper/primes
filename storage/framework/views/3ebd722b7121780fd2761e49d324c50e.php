@@ -20,20 +20,19 @@
 
     <main x-data="skillDisplay">
         
-        <section class="grid grid-cols-3">
-            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $dtrData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $dtr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div>
+        <section >
+            <div>
 
                     <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','xOn:click' => 'generateMe('.e($key).')']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','xOn:click' => 'generateMe()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::icon-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','x-on:click' => 'generateMe('.e($key).')']); ?>
+<?php $component->withAttributes(['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','x-on:click' => 'generateMe()']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
@@ -49,7 +48,7 @@
                         <?php echo e($this->form); ?>
 
                     </div>
-                    <div :id="'table' + <?php echo e($key); ?>"
+                    <div :id="'table'"
                         class="block w-fit  overflow-x-auto   mx-auto text-xs relative ">
 
 
@@ -60,7 +59,7 @@
                             <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
                             <p class="text-center ">-----o0o-----</p>
                             <p class="border-b border-black text-center font-bold mt-4">
-                                <?php echo e(explode('--', $dtr['user_name'])[1]); ?></p>
+                                <?php echo e(explode('--', $dtrData['user_name'])[1]); ?></p>
                             <h6 class="text-center text-xs">(Name)</h6>
                             <div class="grid grid-cols-5 pt-5">
                                 <div class="col-span-2 px-3">
@@ -70,7 +69,7 @@
                                 </div>
                                 <div class="col-span-3">
                                     <p class="border-b border-black text-center font-bold uppercase">
-                                        <?php echo e(\Carbon\Carbon::parse($dtr['date'])->format('F Y')); ?>
+                                        <?php echo e(\Carbon\Carbon::parse($dtrData['date'])->format('F Y')); ?>
 
                                     </p>
                                     <div class="grid grid-cols-2 py-1">
@@ -84,7 +83,7 @@
                                 </div>
                             </div>
                             
-                            <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($dtr)->toHtml() ?> }" class=" max-w-[29rem]  h-full pt-10">
+                            <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class=" max-w-[29rem]  h-full pt-10">
                                 <table class="border-collapse w-full ">
                                     <tr class="">
                                         <td class="border border-black border-solid px-2.5 text-center" rowspan="2">
@@ -116,7 +115,7 @@
                                             Minutes</td>
                                     </tr>
 
-                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtr['dtr'], true)['data']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtrData['dtr'], true)['data']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr x-data="{ date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?> }">
                                             <td
                                                 class="border-l border-b border-black border-solid px-2.5 py-1  font-bold text-center whitespace-nowrap">
@@ -399,7 +398,6 @@
 
                     </div>
                 </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
         </section>
     </main>
@@ -493,12 +491,12 @@
             updateDtr(value, id) {
                 $wire.updateDtr(value, id);
             },
-            async generateMe(id) {
+            async generateMe() {
 
                 const {
                     jsPDF
                 } = window.jspdf;
-                const element = document.getElementById('table' + id);
+                const element = document.getElementById('table');
 
                 // Capture the content of the div using html2canvas
                 const scale = 5; // Adjust scale for resolution

@@ -7,13 +7,12 @@
 
 
 
-                    {{ ($getAction('dtr'))([1 => $this->dtrArrView]) }}
-                    <div x-data="{model: @js($this->dtrArrView)}">
-                        {{$this->form}}
-                    </div>
+                    <?php echo e(($getAction('dtr'))([1 => $dtrArrView])); ?>
 
-                    {{-- Content --}}
-                    <div x-data="{employee: @js(json_decode($this->dtrArrView['dtr'])->data)}">
+
+
+                    
+                    <div x-data="{employee: <?php echo \Illuminate\Support\Js::from(json_decode($dtrArrView['dtr'])->data)->toHtml() ?>}">
                         <table>
                             <tr>
                                 <td class="border px-2.5 text-center" rowspan="2">Days</td>
@@ -30,15 +29,16 @@
                                 <td class="border px-2.5 text-center">Minutes</td>
                             </tr>
 
-                            @foreach(json_decode($this->dtrArrView['dtr'])->data as $dateKey => $date)
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtrArrView['dtr'])->data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                                <tr x-data="{date: @js($date)}">
+                                <tr x-data="{date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?>}">
                                     <td class="border px-2.5 font-bold text-center"
                                         :class="{
                                                                 'bg-gray-500': date.fc,
                                                             }">
 
-                                        {{explode('-',$dateKey)[1]}}
+                                        <?php echo e(explode('-',$dateKey)[1]); ?>
+
                                     </td>
                                     <td class=" px-2.5 text-center border"
                                         :class="{
@@ -52,14 +52,14 @@
                                         x-text="convertDate(date)"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_am.time"></td>
+                                        x-text="date.date_departure_am"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_arrival_pm.time">
+                                        x-text="date.date_arrival_pm">
                                     </td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
-                                        x-text="date.date_departure_pm.time"></td>
+                                        x-text="date.date_departure_pm"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
                                         x-text="convertUndertime('h',date)">
@@ -74,7 +74,7 @@
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ? 'hidden' : ''"
                                         x-text="decrease(date)"></td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                             <div>
                                 <p x-text="month" class="font-bold"></p>
 
@@ -93,12 +93,15 @@
 
 </div>
 
-@script
+    <?php
+        $__scriptKey = '3292039888-0';
+        ob_start();
+    ?>
 <script>
     Alpine.data('dtrx', () => ({
-        {{--// disabledDate: $wire.{{ $applyStateBindingModifiers("\$entangle('dtrArr')"),--}}
+        
         //            disabledDate:$wire.$entangle('dtrArrView'),
-        disabledDate: @js(json_decode($getRecord()->dtr)),
+        disabledDate: <?php echo \Illuminate\Support\Js::from(json_decode($getRecord()->dtr))->toHtml() ?>,
         month: $wire.$entangle('month'),
         total: 0,
         convertUndertime(type, date) {
@@ -118,7 +121,7 @@
         },
         decrease(date) {
 
-            if (date.late > 0) {
+            if (date.late > 0 && date.type == 'Full') {
                 // this.total += parseInt(date.late)
 
                 return 'L = ' + date.late;
@@ -127,7 +130,7 @@
         },
         totalPerEmployee(employee) {
             var x = 0;
-
+            console.log(employee)
             Object.entries(employee).forEach(([key, value]) => {
                 if (typeof (value) !== 'string') {
 
@@ -162,7 +165,7 @@
             } else if (date.type == 'Absent') {
                 return date.type;
             } else {
-                return date.date_arrival_am.time;
+                return date.date_arrival_am;
             }
 
         },
@@ -188,4 +191,9 @@
         }
     }));
 </script>
-@endscript
+    <?php
+        $__output = ob_get_clean();
+
+        \Livewire\store($this)->push('scripts', $__output, $__scriptKey)
+    ?>
+<?php /**PATH /home/loyd-deped/Desktop/www/PDS/resources/views/livewire/leave/my/dtr_view.blade.php ENDPATH**/ ?>
