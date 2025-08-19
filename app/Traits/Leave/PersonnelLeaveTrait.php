@@ -9,9 +9,94 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 trait PersonnelLeaveTrait
 {
 
+    public function loadDtrCondition($start, $end, $event, $departure_start, $arrival_end, $fc)
+    {
+        // Get day-specific time thresholds
+        $max_arrival = $this->minDate($event);
+        $max_departure_old = $event?->type == '5' ? Carbon::parse($event?->max_departure) : $this->getExpectedDepartureTime($fc);
+
+        $min_arrival = Carbon::parse('07:00 AM');
+        $min_departure = Carbon::parse('04:00 PM');
+        // Calculate late minutes if arrived after max arrival time
+        $late = $this->estimateLate($start, $max_arrival);
+        // Adjust arrival if before minimum
+        if ($start < $min_arrival) {
+            $start = $min_arrival;
+            $max_departure_of_employee = Carbon::parse($start)->addHours(9);
+
+            // Calculate total time spent (arrival to departure)
+            $max_departure = $max_departure_of_employee < $max_departure_old ? $max_departure_of_employee : $max_departure_old;
+        } else {
+            $max_departure_of_employee = Carbon::parse($start)->addHours(9);
+
+            // Calculate total time spent (arrival to departure)
+            $max_departure =  $max_departure_old;
+        }
 
 
-    public function loadDtr(): void
+        $difference = $start->diff($end);
+        $actualWorkingMinutes = $difference->h * 60 + $difference->i;
+
+        // NEW: Check if worked less than 4 hours (no lunch deduction)
+        if ($actualWorkingMinutes < 240) { // 4 hours = 240 minutes
+            // Calculate pure working time without lunch deduction
+            $morningSession = $start->diffInMinutes($departure_start);
+            $afternoonSession = $arrival_end->diffInMinutes($end);
+            $actualWorkingMinutes = $morningSession + $afternoonSession;
+
+            // Special status for short work durations
+
+            $type = 'Halfday';
+            $undertime = $max_departure->diffInMinutes($end);
+
+            $editable = true;
+        } else { // Normal case (4+ hours)
+            // Calculate undertime (with lunch deduction)
+            // $undertime = $this->estimateUndertimeNew($difference, 'full', $date);
+            //  dd($arrival_start,$max_departure,$max_departure->diffInMinutes($end));
+            $undertime = $max_departure->diffInMinutes($end);
+            if ($max_departure_of_employee > $max_departure) {
+                $undertime = $max_departure->diffInMinutes($end);
+            }
+            if ($max_departure_of_employee < $max_departure) {
+                $undertime = $max_departure_of_employee->diffInMinutes($end);
+            }
+            if ($end > $max_departure || $end > $max_departure_of_employee) {
+                $undertime  = 0;
+            }
+            // dd($max_departure_of_employee > $max_departure,$max_departure_of_employee, $max_departure);
+
+
+            // Expected working minutes (7 hours = 420 minutes excluding lunch)
+            $expectedWorkingMinutes = 7 * 60;
+
+            // Determine status type
+            if ($actualWorkingMinutes >= ($expectedWorkingMinutes - 15)) {
+                if ($late > 0 && $undertime > 0) {
+                    $type = 'L/UT';
+                } elseif ($late > 0) {
+                    $type = 'Late';
+                } elseif ($undertime > 15) {
+                    $type = 'UT';
+                } else {
+                    $type = 'Full';
+                    // $undertime = 0;
+                    $editable = false;
+                }
+            } else {
+                $type = 'L/UT';
+            }
+            $editable = $type !== 'Full';
+        }
+        return [
+            $editable,
+            $type,
+            $undertime,
+            $late,
+            $difference
+        ];
+    }
+    public function loadDtrNew(): void
     {
         $arr = [];
         $arrival_am = [];
@@ -92,14 +177,14 @@ trait PersonnelLeaveTrait
         foreach ($arr as $key => $days) {
 
             foreach ($days['data'] as $dayKey => $day) {
-
+                $fc = false;
                 $date = Carbon::parse($this->month)->addDays((int)explode('-', $dayKey)[1] - 1);
 
                 $arrival_start = '';
                 $arrival_end = '';
                 $departure_start = '';
                 $departure_end = '';
-                    $editable = true;
+                $editable = true;
                 if (!!$day['date_arrival_am']) {
                     $arrival_start = str_contains($day['date_arrival_am'], 'TRAVEL') ? $day['date_arrival_am'] : Carbon::parse($day['date_arrival_am']);
                 }
@@ -117,129 +202,116 @@ trait PersonnelLeaveTrait
 
                 // check event
                 $event = \App\Models\Leave\LeaveCalendar::query()->whereDate('start', $date)->first();
-
+                $fc = $event?->type == '1' ? true : false;
                 if (str_contains($day['date_arrival_am'], 'TRAVEL')) {
                     $type = 'travel';
-                     $editable = false;
+                    $editable = false;
                 }
-                # in: true , out: true , in: true, out: true
-                elseif (!!$arrival_start && !!$arrival_end && !!$departure_start && !!$departure_end) {
-
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
-                    $difference = $arrival_start->diff($departure_end);
-
-                    $undertime = $this->estimateUndertime($difference);
-                    $type = 'Full';
-                     $editable = false;
-                }
-                # in: false , out: false , in: false, out: false
-                elseif ($arrival_start == '' && $arrival_end == '' && $departure_start == '' && $departure_end == '') {
-
-                    $type = 'Absent';
-                    $difference = '';
-                    $late = 0;
-                    $undertime = 0;
-
-                }
-                # in: false , out: true , in: true, out: false
-                elseif ($arrival_start == '' && $arrival_end != '' && $departure_start != '' && $departure_end == '') {
+                if (true) {
+                    // if ($arrival_start == '' && $arrival_end == '' && $departure_start == '' && $departure_end == '') {
 
                     $type = 'Absent';
                     $difference = '';
                     $late = 0;
                     $undertime = 0;
                 }
-                # in: true , out: false , in: true, out: false
-                elseif (!!$arrival_start && $arrival_end == '' && !!$departure_start && $departure_end == '') {
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
 
-                    $difference = $arrival_start->diff($departure_start);
+                if (!!$arrival_start && !!$departure_start && !!$arrival_end &&  !!$departure_end) {
 
-                    $undertime = $this->estimateUndertime($difference, 'halfday');
+                    [$editable, $type, $undertime, $late, $difference] = $this->loadDtrCondition($arrival_start, $departure_end, $event, $departure_start, $arrival_end, $fc);
 
-                    $type = 'UT';
-                    // $type = 'UT';
-                    // $max_time = $this->minDate($event);
-                    // $late = $this->estimateLate($arrival_start, $max_time);
 
-                    // $difference = $arrival_start->diff($departure_start);
-                    // $time = sprintf('%02d:%02d', $difference->h - 1, $difference->i);
+                    // Get day-specific time thresholds
+                    // $max_arrival = $this->minDateNew($event);
+                    // $max_departure_old = $event?->type == '5' ? Carbon::parse($event?->max_departure) : $this->getExpectedDepartureTime($fc);
 
-                    // $carbonTime = Carbon::createFromFormat('H:i', $time);
-                    // // Create a Carbon instance for 8:00:00
-                    // $eightHours = Carbon::createFromFormat('H:i', '08:00');
-                    // // Check if the given time is greater than 8 hours
-                    // if ($carbonTime > $eightHours) {
-                    //     $undertime = 0;
-                    //     $type = 'Full';
+                    // $min_arrival = Carbon::parse('07:00 AM');
+                    // $min_departure = Carbon::parse('04:00 PM');
+                    // // Calculate late minutes if arrived after max arrival time
+                    // $late = $this->estimateLate($arrival_start, $max_arrival);
+                    // // Adjust arrival if before minimum
+                    // if ($arrival_start < $min_arrival) {
+                    //     $arrival_start = $min_arrival;
+                    //     $max_departure_of_employee = Carbon::parse($arrival_start)->addHours(9);
+
+                    //     // Calculate total time spent (arrival to departure)
+                    //     $max_departure = $max_departure_of_employee < $max_departure_old ? $max_departure_of_employee : $max_departure_old;
                     // } else {
-                    //     $differenceTime = $eightHours->diff($carbonTime);
-                    //     $type = 'L/UT';
-                    //     $undertime = $differenceTime->h * 60 + $differenceTime->i;
+                    //     $max_departure_of_employee = Carbon::parse($arrival_start)->addHours(9);
+
+                    //     // Calculate total time spent (arrival to departure)
+                    //     $max_departure =  $max_departure_old;
+                    // }
+
+
+                    // $difference = $arrival_start->diff($departure_end);
+                    // $actualWorkingMinutes = $difference->h * 60 + $difference->i;
+
+                    // // NEW: Check if worked less than 4 hours (no lunch deduction)
+                    // if ($actualWorkingMinutes < 240) { // 4 hours = 240 minutes
+                    //     // Calculate pure working time without lunch deduction
+                    //     $morningSession = $arrival_start->diffInMinutes($departure_start);
+                    //     $afternoonSession = $arrival_end->diffInMinutes($departure_end);
+                    //     $actualWorkingMinutes = $morningSession + $afternoonSession;
+
+                    //     // Special status for short work durations
+
+                    //     $type = 'Halfday';
+                    //     $undertime = $max_departure->diffInMinutes($departure_end);
+
+                    //     $editable = true;
+                    // } else { // Normal case (4+ hours)
+                    //     // Calculate undertime (with lunch deduction)
+                    //     // $undertime = $this->estimateUndertimeNew($difference, 'full', $date);
+                    //     //  dd($arrival_start,$max_departure,$max_departure->diffInMinutes($departure_end));
+                    //     $undertime = $max_departure->diffInMinutes($departure_end);
+                    //     if ($max_departure_of_employee > $max_departure) {
+                    //         $undertime = $max_departure->diffInMinutes($departure_end);
+                    //     }
+                    //     if ($max_departure_of_employee < $max_departure) {
+                    //         $undertime = $max_departure_of_employee->diffInMinutes($departure_end);
+                    //     }
+                    //     if ($departure_end > $max_departure || $departure_end > $max_departure_of_employee) {
+                    //         $undertime  = 0;
+                    //     }
+                    //     // dd($max_departure_of_employee > $max_departure,$max_departure_of_employee, $max_departure);
+
+
+                    //     // Expected working minutes (7 hours = 420 minutes excluding lunch)
+                    //     $expectedWorkingMinutes = 7 * 60;
+
+                    //     // Determine status type
+                    //     if ($actualWorkingMinutes >= ($expectedWorkingMinutes - 15)) {
+                    //         if ($late > 0 && $undertime > 0) {
+                    //             $type = 'L/UT';
+                    //         } elseif ($late > 0) {
+                    //             $type = 'Late';
+                    //         } elseif ($undertime > 15) {
+                    //             $type = 'UT';
+                    //         } else {
+                    //             $type = 'Full';
+                    //             // $undertime = 0;
+                    //             $editable = false;
+                    //         }
+                    //     } else {
+                    //         $type = 'L/UT';
+                    //     }
+                    //     $editable = $type !== 'Full';
                     // }
                 }
-                # in: true , out: true , in: false, out: false
-                elseif (!!$arrival_start && !!$arrival_end && $departure_start == '' && $departure_end == '') {
+                if (!!$arrival_start && !!$departure_start && !!$arrival_end &&  $departure_end == '') {
 
-                    $type = 'UT';
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
-
-                    $difference = $arrival_start->diff($arrival_end);
-                    $time = sprintf('%02d:%02d', $difference->h, $difference->i);
-
-                    $carbonTime = Carbon::createFromFormat('H:i', $time);
-                    // Create a Carbon instance for 8:00:00
-                    $eightHours = Carbon::createFromFormat('H:i', '04:00');
-                    // Check if the given time is greater than 4 hours
-                    if ($carbonTime > $eightHours) {
-                        $undertime = 0;
-                        $type = 'Halfday';
-                    } else {
-                        $differenceTime = $eightHours->diff($carbonTime);
-                        $type = 'L/UT';
-                        $undertime = $differenceTime->h * 60 + $differenceTime->i;
-                    }
-                }
-                # in: false , out: true , in: false, out: true
-                elseif ($arrival_start == '' && !!$arrival_end && $departure_start == '' && !!$departure_end) {
-                    $type = 'UT';
-                    $difference = $arrival_end->diff($departure_end);
-                    $undertime = $this->estimateUndertime($difference);
-                    $late = 0;
-                    $undertime = 240;
-                }
-                # in: true , out: true , in: false, out: true
-                elseif (!!$arrival_start && !!$arrival_end && $departure_start == '' && !!$departure_end) {
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
-                    $difference = $arrival_start->diff($departure_end);
-                    $undertime = $this->estimateUndertime($difference);
-                    $type = 'Full';
+                    [$editable, $type, $undertime, $late, $difference] =  $this->loadDtrCondition($arrival_start, $arrival_end, $event, $departure_start, $arrival_end, $fc);
                 }
 
-                # in: true , out: false , in: true, out: true
-                elseif (!!$arrival_start && $arrival_end == '' && !!$departure_start && !!$departure_end) {
+  if (!!$arrival_start && !!$departure_start && $arrival_end == '' &&  $departure_end == '') {
 
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
-
-                    $difference = $arrival_start->diff($departure_end);
-                    $undertime = $this->estimateUndertime($difference);
-                    $type = 'Full';
+                    [$editable, $type, $undertime, $late, $difference] =  $this->loadDtrCondition($arrival_start, $departure_start, $event, $departure_start, $departure_start, $fc);
                 }
-                # in: true , out: true , in: true, out: false
-                elseif (!!$arrival_start && !!$arrival_end && !!$departure_start && $departure_end == '') {
-                    $max_time = $this->minDate($event);
-                    $late = $this->estimateLate($arrival_start, $max_time);
 
-                    $difference = $arrival_start->diff($departure_start);
+                if (!!$arrival_start && !!$departure_start && $arrival_end == '' &&  !!$departure_end) {
 
-                    $undertime = $this->estimateUndertime($difference, 'halfday');
-
-                    $type = 'UT';
+                    [$editable, $type, $undertime, $late, $difference] =  $this->loadDtrCondition($arrival_start, $departure_end, $event, $departure_start, $departure_start, $fc);
                 }
 
                 if ($date->isWeekend()) {
@@ -273,7 +345,7 @@ trait PersonnelLeaveTrait
                             $arr[$key]['data'][$dayKey]['late'] = $late;
                             $arr[$key]['data'][$dayKey]['undertime'] = $undertime;
                             $arr[$key]['data'][$dayKey]['fc'] = $event && $event->type == '1' ? true : false;
-                             $arr[$key]['data'][$dayKey]['editable'] =  $editable;
+                            $arr[$key]['data'][$dayKey]['editable'] =  $editable;
                         }
                     } else {
                         $arr[$key]['data'][$dayKey]['type'] = $type;
@@ -282,16 +354,67 @@ trait PersonnelLeaveTrait
                         $arr[$key]['data'][$dayKey]['undertime'] = $undertime;
                         $arr[$key]['data'][$dayKey]['fc'] = $event && $event->type == '1' ? true : false;
                         $arr[$key]['data'][$dayKey]['editable'] =  $editable;
-
                     }
                 }
             }
         }
         $increment = 0;
 
-
         $this->dtrArr = $arr;
     }
+
+
+    private function getExpectedWorkingHours($date): int
+    {
+        // if ($date->dayOfWeek == Carbon::MONDAY) {
+        //     return 8 * 60; // 8 hours in minutes (7:45 AM to 4:45 PM with 1 hour lunch)
+        // }
+
+        return 8 * 60; // 8 hours in minutes (9:00 AM to 6:00 PM with 1 hour lunch)
+    }
+    public function estimateUndertimeNew($difference, $type = 'full', $date = null): float|int
+    {
+        $undertime = 0;
+
+        if ($type == 'full' && $date) {
+            // For full day, calculate based on expected working hours for the day
+            $expectedDeparture = $this->getExpectedDepartureTime($date);
+            $expectedWorkingHours = $this->getExpectedWorkingHours($date);
+
+            // Calculate actual working time (arrival to departure)
+            $actualWorkingMinutes = $difference->h * 60 + $difference->i;
+
+            // Calculate undertime
+            $undertime = max(0, $expectedWorkingHours - $actualWorkingMinutes);
+        } else {
+            // For half days or when date isn't provided, use the existing logic
+            $time = $type == 'full'
+                ? sprintf('%02d:%02d', $difference->h - 1, $difference->i)
+                : sprintf('%02d:%02d', $difference->h, $difference->i);
+
+            $carbonTime = Carbon::createFromFormat('H:i', $time);
+            $eightHours = Carbon::createFromFormat('H:i', '08:00');
+
+            if ($carbonTime <= $eightHours) {
+                $differenceTime = $eightHours->diff($carbonTime);
+                $undertime = $differenceTime->h * 60 + $differenceTime->i;
+            }
+        }
+
+        return $undertime;
+    }
+
+
+    public function getExpectedDepartureTime($fc = false): Carbon
+    {
+        if ($fc) {
+            return Carbon::parse('04:45 PM'); // Monday
+        }
+
+        return Carbon::parse('06:00 PM'); // Tuesday-Friday
+    }
+    ############################################ OLD CODE ###############################
+
 
 
     public function getColumnValue($column, $sheet, $currentDate, $first = false): string
@@ -382,7 +505,6 @@ trait PersonnelLeaveTrait
     {
         $diff = $start->diff($max_time);
         $differenceInMinutes = $diff->h * 60 + $diff->i;
-
         if ($diff->invert) {
             $late = $differenceInMinutes;
         } else {

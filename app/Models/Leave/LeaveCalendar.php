@@ -19,6 +19,7 @@ class LeaveCalendar extends Model
         'url',
         'title',
         'id_number',
-        'type'
+        'type',
+        'max_departure'
     ];
 }

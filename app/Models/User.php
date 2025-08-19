@@ -39,7 +39,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Leave\LeaveCto::class,'id_number','id_number')->orderBy('expired_date','asc')->where('status',\App\Enums\CtoStatusEnum::ACTIVE->value);
     }
-
+ public function leaveCard()
+    {
+        return $this->hasOne(\App\Models\Leave\LeaveCard::class,'id_number','id_number')->latest('start_date');
+    }
     public function leavePointLatest()
     {
         return $this->hasOne(\App\Models\LeaveEmployee::class,'id_number','id_number')->latest();

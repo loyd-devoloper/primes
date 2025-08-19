@@ -14,11 +14,7 @@
                 <x-filament::section collapsible size="sm">
 
                     <x-slot name="heading">
-                        <label>
-                            <x-filament::input.checkbox wire:model="isAdmin" />
 
-
-                        </label>
                         <span x-text="index"></span>
                     </x-slot>
                     <div>
@@ -136,7 +132,8 @@
 
                 //     return 'UT = ' + date.undertime;
                 // }
-                if (date.late > 0 && date.type == 'Full') {
+
+                if (date.late > 0) {
                     // this.total += parseInt(date.late)
 
                     return 'L = ' + date.late;
@@ -200,6 +197,9 @@
                         Object.values(newVal.data).forEach(element => {
 
                             if (element.type == 'UT') {
+                                this.total += parseInt(element.undertime)
+                            }
+                             if (element.type == 'L/UT') {
                                 this.total += parseInt(element.undertime)
                             }
                             if (element.late > 0 && element.type == 'Full') {

@@ -3,6 +3,7 @@
 namespace App\Traits\ApplicationTable;
 
 use Carbon\Carbon;
+use Filament\Forms\Get;
 use Illuminate\Support\Str;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,8 @@ use Filament\Tables\Actions\BulkAction;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
+
 
 
 trait BulkActionTrait
@@ -169,7 +172,8 @@ trait BulkActionTrait
                         Select::make('type')->options([
                             'First' => 'Open Ranking',
                             'Reschedule' => 'Open Ranking(Reschedule)',
-                        ])->required()
+                        ])->required()->live(),
+                        DateTimePicker::make('date')->hidden(fn(Get $get) => $get('type') !== 'Reschedule')->required()
                     ])
                     ->label('Send Open ranking Email')
                     ->action(function ($records, $data) {
@@ -184,10 +188,10 @@ trait BulkActionTrait
                             $records->each(function ($record) use ($type, $data, $type2) {
 
                                 if ($data['type'] == 'First') {
-                                    Mail::to($record->email)->queue(new \App\Mail\Recruitment\OpenRanking($record));
+                                    Mail::to($record->email)->queue(new \App\Mail\Recruitment\OpenRanking($record,$record?->jobOtherInformation?->open_ranking));
                                 } else {
 
-                                    Mail::to($record->email)->queue(new \App\Mail\Recruitment\RescheduleOpenRanking($record));
+                                    Mail::to($record->email)->queue(new \App\Mail\Recruitment\RescheduleOpenRanking($record,$data['date']));
                                 }
 
                                 \App\Models\ApplicantLog::create([
@@ -272,6 +276,11 @@ trait BulkActionTrait
                     ->action(function ($records, $data) {
 
                         $first = $records->first();
+                        $records->first()->jobOtherInformation?->psbs->each(function ($psb) use($first)  {
+
+                               Mail::to($psb->psbInformation->email)->queue(new \App\Mail\Recruitment\Car($first));
+                        });
+
                         if (!!$first?->batchInfo?->car_file) {
                             $records->each(function ($record) {
 //                                if($record->application_code == $record?->batchInfo?->hired_applicant_id)

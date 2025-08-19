@@ -57,7 +57,8 @@ class Calendar extends Component implements HasForms, HasActions
                         '1' => 'Flag Ceremony',
                         '2' => 'Regular Holidays',
                         '3' => 'Special Non-Working Holidays',
-                        '4' => 'Work Suspention',
+                        '4' => 'Work Suspension',
+                        '5' => 'Halday/Customize',
                     ])->required()
                     ->afterStateUpdated(function (Set $set, $state) {
                         // Update the title based on the selected type
@@ -75,7 +76,10 @@ class Calendar extends Component implements HasForms, HasActions
 
                 DatePicker::make('start')
                     ->native(false)
+                    ->required(),
+                TimePicker::make('max_departure')
                     ->required()
+                    ->hidden(fn(Get $get) => $get('type') != '5' || $get('type') == '')
                 // ->visible(fn(Get $get) => !!$get('type') ? true : false),
 
                 // DatePicker::make('end')
@@ -92,6 +96,8 @@ class Calendar extends Component implements HasForms, HasActions
                 } elseif ($data['type'] == '3') {
                     $data['backgroundColor'] = '#535955';
                 } elseif ($data['type'] == '4') {
+                    $data['backgroundColor'] = '#fa6000';
+                }elseif ($data['type'] == '5') {
                     $data['backgroundColor'] = '#fa6000';
                 }
                 $data['start'] = Carbon::parse($data['start'])->format('Y-m-d');
@@ -131,10 +137,37 @@ class Calendar extends Component implements HasForms, HasActions
                     // TimePicker::make('startTime')->seconds(false),
                     // TimePicker::make('endTime')->seconds(false),
 
-
                     // ColorPicker::make('backgroundColor')->default($data?->backgroundColor)
 
+ Select::make('type')
+                    ->reactive()
+                    ->options([
+                        '1' => 'Flag Ceremony',
+                        '2' => 'Regular Holidays',
+                        '3' => 'Special Non-Working Holidays',
+                        '4' => 'Work Suspension',
+                        '5' => 'Halday/Customize',
+                    ])->required()->deafult($data?->type)
+                    ->afterStateUpdated(function (Set $set, $state) {
+                        // Update the title based on the selected type
+                        if ($state == '1') {
+                            $set('title', 'Flag Ceremony');
+                        } else {
+                            $set('title', ''); // Clear the title if not 'Flag Ceremony'
+                        }
+                    }),
+                TextInput::make('title')
+                    ->reactive()
+                    // ->visible(fn(Get $get) => !!$get('type') && $get('type') != '1' ? true : false)
+                    ->required()->default($data?->title),
 
+
+                DatePicker::make('start')
+                    ->native(false)
+                    ->required(),
+                TimePicker::make('max_departure')
+                    ->required()
+                    ->hidden(fn(Get $get) => $get('type') != '5' || $get('type') == '')
                 ];
             })
             ->action(function ($data, $arguments) {
@@ -164,7 +197,7 @@ class Calendar extends Component implements HasForms, HasActions
             ->iconButton()
             ->icon('heroicon-o-trash')
             ->requiresConfirmation()
-            ->action(function ( $arguments) {
+            ->action(function ($arguments) {
 
                 \App\Models\Leave\LeaveCalendar::where('id', $arguments['id'])->delete();
                 Notification::make()

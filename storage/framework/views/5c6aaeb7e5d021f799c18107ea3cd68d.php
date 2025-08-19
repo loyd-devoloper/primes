@@ -77,30 +77,7 @@
 <?php $component->withAttributes(['collapsible' => true,'size' => 'sm']); ?>
 
                      <?php $__env->slot('heading', null, []); ?> 
-                        <label>
-                            <?php if (isset($component)) { $__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.checkbox','data' => ['wire:model' => 'isAdmin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament::input.checkbox'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'isAdmin']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d)): ?>
-<?php $attributes = $__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d; ?>
-<?php unset($__attributesOriginal087b30d649cc1cfb7e9ea8930c92d47d); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d)): ?>
-<?php $component = $__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d; ?>
-<?php unset($__componentOriginal087b30d649cc1cfb7e9ea8930c92d47d); ?>
-<?php endif; ?>
 
-
-                        </label>
                         <span x-text="index"></span>
                      <?php $__env->endSlot(); ?>
                     <div>
@@ -230,7 +207,8 @@
 
                 //     return 'UT = ' + date.undertime;
                 // }
-                if (date.late > 0 && date.type == 'Full') {
+
+                if (date.late > 0) {
                     // this.total += parseInt(date.late)
 
                     return 'L = ' + date.late;
@@ -294,6 +272,9 @@
                         Object.values(newVal.data).forEach(element => {
 
                             if (element.type == 'UT') {
+                                this.total += parseInt(element.undertime)
+                            }
+                             if (element.type == 'L/UT') {
                                 this.total += parseInt(element.undertime)
                             }
                             if (element.late > 0 && element.type == 'Full') {

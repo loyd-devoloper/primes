@@ -55,7 +55,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
         if ($property === 'file') {
             $this->file = !!$value ? $value->getFilename() : '';
 
-            $this->loadDtr();
+            $this->loadDtrNew();
         }
     }
 
@@ -88,7 +88,7 @@ class BulkDtr extends Component implements HasForms, HasTable, HasActions
                             ->color(Color::Gray)
                             ->action(function ($action) {
                                 $this->file = '';
-                                $this->loadDtr();
+                                $this->loadDtrNew();
                                 $action->cancelParentActions();
                             })
                     ])

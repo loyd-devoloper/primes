@@ -23,15 +23,15 @@
 <div class="container">
     <p>Dear Applicants,</p>
     <p>Good day!</p>
-    <p>Your application for the <span style="font-weight: bold">{{ $job_title }}</span> in the  <span style="font-weight: bold">{{ $place_of_assignment }}</span> has been submitted.
+    <p>Your application for the <span style="font-weight: bold"><?php echo e($job_title); ?></span> in the  <span style="font-weight: bold"><?php echo e($place_of_assignment); ?></span> has been submitted.
     </p>
     <p>
         Please be informed that the Human Resource Merit Promotion and Selection Board
-        (HRMPSB) shall convene with the applicants for the <span style="font-weight: bold">{{ $job_title }}</span> position <span style="font-weight: bold">{{ $data->jobInfo?->plantilla_item }}</span> in the <span style="font-weight: bold">{{ $place_of_assignment }}</span>, this Office, on <span style="font-weight: bold">{{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</span> from <span style="font-weight: bold">{{ \Carbon\Carbon::parse($time)->format('h:i:s A') }}</span> onwards at the
-        <span style="font-weight: bold">{{$venue}}</span>.
+        (HRMPSB) shall convene with the applicants for the <span style="font-weight: bold"><?php echo e($job_title); ?></span> position <span style="font-weight: bold"><?php echo e($data->jobInfo?->plantilla_item); ?></span> in the <span style="font-weight: bold"><?php echo e($place_of_assignment); ?></span>, this Office, on <span style="font-weight: bold"><?php echo e(\Carbon\Carbon::parse($date)->format('M d, Y')); ?></span> from <span style="font-weight: bold"><?php echo e(\Carbon\Carbon::parse($time)->format('h:i:s A')); ?></span> onwards at the
+        <span style="font-weight: bold"><?php echo e($venue); ?></span>.
     </p>
     <p>Relative to this, please report at the Office (a face-to-face activity) on the abovementioned
-        schedule for the Assessment and Open Ranking of applicants for the <span style="font-weight: bold">{{ $job_title }}</span>
+        schedule for the Assessment and Open Ranking of applicants for the <span style="font-weight: bold"><?php echo e($job_title); ?></span>
         position.</p>
     <p>Kindly acknowledge this e-mail as confirmation of your attendance.</p>
     <p>Non-participation in the scheduled activity shall mean disqualification.</p>
@@ -52,3 +52,4 @@
 </body>
 </html>
 
+<?php /**PATH /home/loyd-deped/Desktop/www/PDS/resources/views/emails/recruitment/reschedule_open_ranking.blade.php ENDPATH**/ ?>

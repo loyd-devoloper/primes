@@ -361,7 +361,7 @@ class Employees extends Component  implements HasForms, HasTable
         return $table
             ->query(User::query()
                 ->select('id', 'name', 'id_number', 'fd_code', 'profile')
-                ->with(['leaveEarn', 'user_fd_code', 'leavePointLatest', 'leaveRequests' => function ($query) {
+                ->with(['leaveCard','leaveEarn', 'user_fd_code', 'leavePointLatest', 'leaveRequests' => function ($query) {
                     $query->where('status', \App\Enums\LeaveStatusEnum::APPROVED->value);
                 }])
                 ->whereHas('workExperienceCurrent', function ($query) {
@@ -480,6 +480,7 @@ class Employees extends Component  implements HasForms, HasTable
                     Action::make('Leave Dashboardx')
                         ->label('LATE UNDERTIME')
                         ->form(function ($record) {
+
                             return [
                                 Fieldset::make('Label')->label('L/UT')
                                     ->schema([
@@ -492,15 +493,15 @@ class Employees extends Component  implements HasForms, HasTable
                                                         if (preg_match('/^\d{2}-\d{2}-\d{2}$/', $get('particular'))) {
                                                             [$day, $hour, $min] = explode('-', $get('particular'));
 
-                                                            $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
+                                                            $total =(1.00*(int)$day) + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
 
 
                                                             return $total;
                                                         }
                                                     }),
-                                                DatePicker::make('date')->required()
-                                                ->minDate(Carbon::parse($record?->leavePointLatest?->current_month)->firstOfMonth())
-                                                ->maxDate(Carbon::parse($record?->leavePointLatest?->current_month)->lastOfMonth())->native(false),
+                                                // DatePicker::make('date')->required()
+                                                // ->minDate(Carbon::parse($record?->leavePointLatest?->current_month)->firstOfMonth())
+                                                // ->maxDate(Carbon::parse($record?->leavePointLatest?->current_month)->lastOfMonth())->native(false),
                                                 Textarea::make('remarks')->label('remarks')->required()
                                             ])
                                             ->columns(2)
@@ -523,16 +524,16 @@ class Employees extends Component  implements HasForms, HasTable
                                 $newCurrentMonth = Carbon::parse($record?->leavePointLatest?->current_month)->addMonth();
 
                                 $advanceSetting = \App\Models\Leave\LeaveAdvanceSetting::query()->where('id', 1)->first();
-
+                                $latestLeaveCard = Carbon::parse($record->leaveCard->start_date);
                                 foreach ($sorted as $key => $value) {
                                     [$day, $hour, $min] = explode('-', $value['particular']);
-                                    $total = $advanceSetting['days' . (int)$day] + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
+                                    $total = (1.00*(int)$day) + $advanceSetting['hours' . (int)$hour] + $advanceSetting['min' . (int)$min];
                                     $record->leavePointLatest->update([
                                         'vl' => (float)$record->leavePointLatest?->vl - $total
                                     ]);
                                     \App\Models\Leave\LeaveCard::query()
                                         ->create([
-                                            'start_date' => Carbon::parse($value['date']),
+                                            'start_date' => $latestLeaveCard->copy()->addDay(),
                                             'days' => str_pad($day, 2, '0', STR_PAD_LEFT),
                                             'hours' => $hour,
                                             'mins' => $min,
@@ -543,6 +544,7 @@ class Employees extends Component  implements HasForms, HasTable
                                             'sl_balance' => $record->leavePointLatest?->sl,
                                             'id_number' => $record->id_number
                                         ]);
+                                        $latestLeaveCard->addDay();
                                 }
                                 \App\Models\Leave\LeaveCard::query()
                                     ->create([

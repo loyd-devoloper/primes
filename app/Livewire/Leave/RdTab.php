@@ -5,7 +5,6 @@ namespace App\Livewire\Leave;
 use App\Traits\Leave\LeaveRequestTrait;
 use Carbon\Carbon;
 use App\Models\User;
-use Filament\Tables;
 use Livewire\Component;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;

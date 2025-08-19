@@ -18,7 +18,6 @@ use App\Enums\RecruitmentLabelEnum;
 use App\Models\RecruitmentJobBatch;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Group;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +25,6 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Filters\Indicator;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -123,7 +121,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
 
                 ->with(['applicantGrades' => function ($q) {
                 $q->with('psbInfo');
-            },'assignPsb','eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation','myGrade'])
+            },'assignPsb','eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation','jobOtherInformation.psbs.psbInformation:email,id_number','myGrade'])
                 ->where('application_status', 2)
                 ->where('job_id', $this->job_id);
         } elseif ($this->activeTab == 'all') {
@@ -285,15 +283,15 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         $jobTitle = $record->jobInfo->job_title;
                                                         $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
                                                         $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
-                                                     
+
                                                         if (Storage::exists($filePath)) {
-                                                       
+
                                                             return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
                                                         } else if(Storage::exists($filePathUpdate)) {
                                                             return Storage::url($filePathUpdate);
-                                                      
+
                                                         }
-                                                       
+
                                                     }
                                                 $set('token', true);
                                                 return "";
@@ -434,9 +432,9 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                 if (!!$get('select'))
                                                 {
                                                     $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
-                                                 
+
                                                     if (!!$record->$value) {
-                                                          
+
                                                         $set('token', false);
                                                         $batchinfo = $record->batchInfo->id;
                                                         $batchName = $record->batchInfo->batch_name;
@@ -444,15 +442,15 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         $jobTitle = $record->jobInfo->job_title;
                                                         $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
                                                         $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
-                                          
+
                                                         if (Storage::exists($filePath)) {
-                                                       
+
                                                             return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
                                                         } else if(Storage::exists($filePathUpdate)) {
                                                             return Storage::url($filePathUpdate);
-                                                      
+
                                                         }
-                                                       
+
                                                     }
                                                     $set('token', true);
                                                     return "";
@@ -598,15 +596,15 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         $jobTitle = $record->jobInfo->job_title;
                                                         $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
                                                         $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
-                                                        
+
                                                         if (Storage::exists($filePath)) {
-                                                       
+
                                                             return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
                                                         } else if(Storage::exists($filePathUpdate)) {
                                                             return Storage::url($filePathUpdate);
-                                                      
+
                                                         }
-                                                       
+
                                                         // $batchinfo = $record->batchInfo->id;
                                                         // $jobInfo = $record->jobInfo->id;
 
@@ -754,22 +752,22 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                 $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
                                                 if (!!$record->$value) {
                                                     $set('token', false);
-                                                
+
                                                     $batchinfo = $record->batchInfo->id;
                                                     $batchName = $record->batchInfo->batch_name;
                                                     $jobInfo = $record->jobInfo->id;
                                                     $jobTitle = $record->jobInfo->job_title;
                                                     $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
                                                     $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
-                                                 
+
                                                     if (Storage::exists($filePath)) {
-                                                   
+
                                                         return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
                                                     } else if(Storage::exists($filePathUpdate)) {
                                                         return Storage::url($filePathUpdate);
-                                                  
+
                                                     }
-                                                   
+
                                                     // $batchinfo = $record->batchInfo->id;
                                                     // $jobInfo = $record->jobInfo->id;
 

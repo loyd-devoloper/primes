@@ -54,6 +54,7 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
     public $minDates = '';
     public $x = '';
     public $disabledDate = null;
+    public $dtrData = [];
 
     // submit button
     public bool $submitActionButton = false;
@@ -66,6 +67,7 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
         $this->activities = \App\Models\Leave\LeaveEmployeeActivityLog::where('id_number', Auth::user()->id_number)->get();
 
         $this->disabledDate = \App\Models\Leave\LeaveCalendar::select('start')->get()->toArray();
+        $this->dtrData = \App\Models\Leave\LeaveBulkDtr::query()->where('id_number', Auth::user()->id_number)->latest()->get();
 
         $this->minDates = Carbon::now()->format('Y-m-d');
     }
@@ -178,13 +180,16 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
             ->icon('heroicon-m-calendar-days')
             ->color(Color::Rose)
             ->size('sm')
-            ->form([
+            ->form(function(){
+
+                return [
                 ViewField::make('rating')
-                    ->view('livewire.leave.personnel.leave-card')
+                    ->view('livewire.leave.asset.dtr_print_employee')
                     ->viewData([
-                        'leaveData' => $this->leaveData,
+                        'dtrData' => $this->dtrData,
                     ])
-            ])
+                    ];
+            })
             ->modalWidth(MaxWidth::Full)
             ->slideOver()
             ->modalSubmitAction(false)
@@ -232,17 +237,18 @@ class MyLeave extends Component implements HasActions, HasForms, HasTable
             ->get();
             // AVAILABLE FORCE LEAVE
             $availableFd = 5 - $fl->sum('days');
+
             return $table
             ->heading('Leave Request')
             ->headerActions([
                 // forms => Leave Request Trait
                 CreateAction::make('Request Leave')
-                   ->disabled(fn() => Carbon::now()->subMonth()->format('F Y') !== $this->leaves?->current_month)
+                   ->disabled(fn() =>Carbon::now()->format('F Y') !== Carbon::parse($this->leaves?->current_month)->format('F Y') || !$this->leaves?->e_sign)
                     ->label('Request Leave')
                     ->icon('heroicon-o-plus')
                     ->slideOver()
                     ->form(function () use ($availableFd) {
-                        dd(Carbon::now()->subMonth()->format('F Y') === $this->leaves?->current_month);
+
                         return $this->leaveRequestFormStore($availableFd);
                     })
                     ->createAnother(false)

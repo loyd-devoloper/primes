@@ -112,6 +112,30 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
         </div>
     </div>";
     }
+
+    public function logTable($data): string
+    {
+        $sl = $data['sl'];
+        $vl = $data['vl'];
+        $fl = $data['fl'];
+        $spl = $data['spl'];
+        return " <table class='w-full border border-collapse border-black border-solid'>
+                    <tbody>
+                        <tr class='text-center'>
+                            <td class='p-3 font-bold border border-black'>SL</td>
+                            <td class='p-3 font-bold border border-black'>VL</td>
+                            <td class='p-3 font-bold border border-black'>FL</td>
+                            <td class='p-3 font-bold border border-black'>SPL</td>
+                        </tr>
+                          <tr class='text-center'>
+                            <td class='p-3 border border-black'>$sl</td>
+                            <td class='p-3 border border-black'>$vl</td>
+                            <td class='p-3 border border-black'>$fl</td>
+                            <td class='p-3 border border-black'>$spl</td>
+                        </tr>
+                    </tbody>
+                </table>";
+    }
     // leave card
     public function slideOverLeaveCardAction()
     {
@@ -238,41 +262,33 @@ class EmployeesView extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('vl')->label('Vacation Leave (VL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->vl)->default($this->leaves?->vl),
                 TextInput::make('fl')->label('Force Leave (FL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->fl)->default($this->leaves?->fl),
                 TextInput::make(name: 'spl')->label('Special Privilege Leave(SPL)')->numeric()->required()->step('any')->helperText("Current Points: ".$this->leaves?->spl)->default($this->leaves?->spl),
-                // Select::make('current_month')
-                //     ->label('Month')
-                //     ->options([
-                //         'January' => 'January',
-                //         'Febuary' => 'Febuary',
-                //         'March' => 'March',
-                //         'April' => 'April',
-                //         'May' => 'May',
-                //         'June' => 'June',
-                //         'July' => 'July',
-                //         'August' => 'August',
-                //         'September' => 'September',
-                //         'October' => 'October',
-                //         'November' => 'November',
-                //         'December' => 'December',
-                //     ])->required()->default($this->leaves?->current_month),
+
                   Flatpickr::make('current_month')
                   ->label('Month')
-                            ->theme(FlatpickrTheme::DARK)
                             ->monthSelect()
 
 
             ])
             ->action(function ($data, $record) {
-                $employeeLeave = \App\Models\LeaveEmployee::updateOrCreate([
-                    "id_number" => $this->employee_id
-                ], [
-                    "sl" => $data["sl"],
-                    "vl" => $data["vl"],
-                    "fl" => $data["fl"],
-                    "spl" => $data["spl"],
-                    "current_month" => Carbon::parse($data["current_month"])->format('F Y'),
-                    'status'=>0
+                // $employeeLeave = \App\Models\LeaveEmployee::updateOrCreate([
+                //     "id_number" => $this->employee_id
+                // ], [
+                //     "sl" => $data["sl"],
+                //     "vl" => $data["vl"],
+                //     "fl" => $data["fl"],
+                //     "spl" => $data["spl"],
+                //     "current_month" => Carbon::parse($data["current_month"])->format('F Y'),
+                //     'status'=>0
 
-                ]);
+                // ]);
+                   $name = Auth::user()->name;
+                    \App\Models\Leave\LeaveEmployeeActivityLog::create([
+                        'activity' => "$name Update Leave points",
+                        'remarks' => $this->logTable( $data),
+                        'employee_leave_id' => $this->employee_id,
+                        'location' => Auth::user()->user_fd_code?->division_name,
+                        'id_number' => Auth::user()->id_number,
+                    ]);
                 Notification::make()
                     ->title('Updated successfully')
                     ->success()

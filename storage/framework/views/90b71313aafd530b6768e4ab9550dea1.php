@@ -150,6 +150,7 @@
                         <!--[if BLOCK]><![endif]--><?php if(!!$leaves): ?>
 
                             <div>
+                                   <!--[if BLOCK]><![endif]--><?php if(\Carbon\Carbon::now()->format('F Y') !== $leaves->current_month): ?>
                                 <div class="bg-orange-200 px-6 py-4 my-4 rounded-md text-xs flex items-center mx-auto ">
                                     <svg viewBox="0 0 24 24" class="text-yellow-600 w-5 h-5 sm:w-5 sm:h-5 mr-3">
                                         <path fill="currentColor"
@@ -163,7 +164,7 @@
                                     </span>
                                 </div>
 
-                                <!--[if BLOCK]><![endif]--><?php if(\Carbon\Carbon::now()->subMonth()->format('F Y') !== $leaves->current_month): ?>
+
                                      <div class="bg-red-200 px-6 py-4 my-4 rounded-md text-xs flex items-center mx-auto ">
                                     <svg viewBox="0 0 24 24" class="text-red-600 w-5 h-5 sm:w-5 sm:h-5 mr-3">
                                         <path fill="currentColor"

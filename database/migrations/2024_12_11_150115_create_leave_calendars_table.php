@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('end')->nullable();
             $table->string('startTime')->nullable();
             $table->string('endTime')->nullable();
+            $table->string('max_departure')->nullable();
             $table->string('title');
             $table->string('id_number');
             $table->boolean('type')->default(1);

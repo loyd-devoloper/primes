@@ -2,10 +2,10 @@
 
 namespace App\Mail\Recruitment;
 
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Carbon;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
@@ -21,9 +21,11 @@ class RescheduleOpenRanking extends Mailable
     public $data = [];
     protected $job_title = '';
     protected $place_of_assignment = '';
-    public function __construct($data)
+   public $date = '';
+    public function __construct($data,$date)
     {
         $this->data = $data;
+        $this->date = $date;
         $this->job_title = $this->data['jobInfo']['job_title'];
         $this->place_of_assignment = $this->data['jobInfo']['place_of_assignment'];
     }
@@ -51,8 +53,8 @@ class RescheduleOpenRanking extends Mailable
                 'data' => $this->data,
                 'job_title' => $this->job_title,
                 'place_of_assignment' => $this->place_of_assignment,
-                'time' =>Carbon::parse($this->data['jobOtherInformation']['open_ranking'])->format('h:i:s A'),
-                'date' => Carbon::parse($this->data['jobOtherInformation']['open_ranking'])->format('Y-m-d'),
+                'time' =>$this->date,
+                'date' => $this->date,
                 'venue' => $this->data['jobOtherInformation']['venue'],
             ]
         );
