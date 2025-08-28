@@ -64,6 +64,9 @@ trait PersonnelLeaveTrait
             if ($end > $max_departure || $end > $max_departure_of_employee) {
                 $undertime  = 0;
             }
+             if ($actualWorkingMinutes >= 240 && $actualWorkingMinutes < 300) {
+                $undertime  = 240;
+            }
             // dd($max_departure_of_employee > $max_departure,$max_departure_of_employee, $max_departure);
 
 
@@ -151,27 +154,66 @@ trait PersonnelLeaveTrait
                 $departure_am["$x-$columnValue"] = $this->getColumnValue("C$key", $sheet, $date, false);
                 $arrival_pm["$x-$columnValue"] = $this->getColumnValue("D$key", $sheet, $date, false);
                 $departure_pm["$x-$columnValue"] = $this->getColumnValue("E$key", $sheet, $date, false);
+                try {
+                    // $time = Carbon::parse($value)->format('h:i A');
+                    $newArrivalAm = Carbon::parse($arrival_am["$x-$columnValue"])->format('H:i');
+                    if ($arrival_am["$x-$columnValue"] == '') {
+                        $newArrivalAm = $departure_pm["$x-$columnValue"];
+                    }
+                } catch (\Exception $e) {
+                    $newArrivalAm = $arrival_am["$x-$columnValue"];
+                }
+                try {
+                    // $time = Carbon::parse($value)->format('h:i A');
+                    $newDepartureAm = Carbon::parse($departure_am["$x-$columnValue"])->format('H:i');
+                    if ($departure_am["$x-$columnValue"] == '') {
+                        $newDepartureAm = $departure_am["$x-$columnValue"];
+                    }
+                } catch (\Exception $e) {
+
+                    $newDepartureAm = $departure_am["$x-$columnValue"];
+                }
+                try {
 
 
+                    $newArrivalPm = Carbon::parse($arrival_pm["$x-$columnValue"])->format('H:i');
+                    if ($arrival_pm["$x-$columnValue"] == '') {
+                        $newArrivalPm = $arrival_pm["$x-$columnValue"];
+                    }
+                } catch (\Exception $e) {
+
+                    $newArrivalPm = $arrival_pm["$x-$columnValue"];
+                }
+                try {
+
+
+                    $newDeparturePm = Carbon::parse($departure_pm["$x-$columnValue"])->format('H:i');
+                    if ($departure_pm["$x-$columnValue"] == '') {
+                        $newDeparturePm = $departure_pm["$x-$columnValue"];
+                    }
+                } catch (\Exception $e) {
+
+                    $newDeparturePm = $departure_pm["$x-$columnValue"];
+                }
 
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['id_number'] = "";
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['status'] = "PENDING";
                 $arr["$increment-" . str_replace(' ', '_', $this->month) . "--" . $name]['data']["$x-$columnValue"] = [
                     'date_arrival_am' => [
-                        'time' => $arrival_am["$x-$columnValue"],
-                        'editable' => $arrival_am["$x-$columnValue"] ? false : true
+                        'time' => $newArrivalAm,
+                        'editable' => $newArrivalAm && !str_contains($newArrivalAm, 'TRAVEL') ? false : true
                     ],
                     'date_departure_am' => [
-                        'time' => $departure_am["$x-$columnValue"],
-                        'editable' => $departure_am["$x-$columnValue"] ? false : true
+                        'time' => $newDepartureAm,
+                        'editable' => $newDepartureAm ? false : true
                     ],
                     'date_arrival_pm' => [
-                        'time' => $arrival_pm["$x-$columnValue"],
-                        "editable" => $arrival_pm["$x-$columnValue"] ? false : true
+                        'time' => $newArrivalPm,
+                        "editable" => $newArrivalPm ? false : true
                     ],
                     'date_departure_pm' => [
-                        'time' => $departure_pm["$x-$columnValue"],
-                        'editable' => $departure_pm["$x-$columnValue"] ? false : true
+                        'time' => $newDeparturePm,
+                        'editable' => $newDeparturePm ? false : true
                     ],
                 ];
 
@@ -220,8 +262,8 @@ trait PersonnelLeaveTrait
                     $type = 'travel';
                     $editable = false;
                 }
-                if (true) {
-                    // if ($arrival_start == '' && $arrival_end == '' && $departure_start == '' && $departure_end == '') {
+                // if (true) {
+                if ($arrival_start == '' && $arrival_end == '' && $departure_start == '' && $departure_end == '') {
 
                     $type = 'Absent';
                     $difference = '';

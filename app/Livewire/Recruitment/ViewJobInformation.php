@@ -48,7 +48,7 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
 
-class ViewJobInformation extends Component  implements HasActions, HasForms,HasTable
+class ViewJobInformation extends Component  implements HasActions, HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -109,33 +109,33 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
     {
         // QUERY FROM DATABASE
         if ($this->activeTab == 'checkfile') {
-            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id',$this->batch)->with(['applicantGrades' => function ($q) {
+            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id', $this->batch)->with(['applicantGrades' => function ($q) {
                 $q->with('psbInfo');
-            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 0)->where('job_id', $this->job_id) ;
+            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 0)->where('job_id', $this->job_id);
         } elseif ($this->activeTab == 'validator') {
-            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id',$this->batch)->with(['applicantGrades' => function ($q) {
+            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id', $this->batch)->with(['applicantGrades' => function ($q) {
                 $q->with('psbInfo');
-            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 1)->where('job_id', $this->job_id) ;
+            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 1)->where('job_id', $this->job_id);
         } elseif ($this->activeTab == 'qualified') {
-            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id',$this->batch)
+            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id', $this->batch)
 
                 ->with(['applicantGrades' => function ($q) {
-                $q->with('psbInfo');
-            },'assignPsb','eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation','jobOtherInformation.psbs.psbInformation:email,id_number','myGrade'])
+                    $q->with('psbInfo');
+                }, 'assignPsb', 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation', 'jobOtherInformation.psbs.psbInformation:email,id_number', 'myGrade'])
                 ->where('application_status', 2)
                 ->where('job_id', $this->job_id);
         } elseif ($this->activeTab == 'all') {
-            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id',$this->batch)->with(['applicantGrades' => function ($q) {
+            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id', $this->batch)->with(['applicantGrades' => function ($q) {
                 $q->with('psbInfo');
-            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('job_id', $this->job_id) ;
+            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('job_id', $this->job_id);
         } elseif ($this->activeTab == 'notqualified') {
-            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id',$this->batch)->with(['applicantGrades' => function ($q) {
+            $query = \App\Models\RecruitmetJobApplication::query()->where('batch_id', $this->batch)->with(['applicantGrades' => function ($q) {
                 $q->with('psbInfo');
-            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 4)->where('job_id', $this->job_id) ;
+            }, 'eligibilityInfo', 'activities', 'activitiesEmail', 'batchInfo', 'jobInfo', 'jobOtherInformation'])->where('application_status', 4)->where('job_id', $this->job_id);
         }
         return $table
             ->query($query)
-             ->emptyStateHeading('No Applicants')
+            ->emptyStateHeading('No Applicants')
             ->deferLoading()
             ->columns([
                 // APPLICANT CODE START
@@ -167,11 +167,11 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                     ->formatStateUsing(function ($record) {
                         $totalqs = 0;
                         $totalPotential = 0;
-                        $count =  $record?->applicantGrades->where('potential_total','!=', null)->where('potential_total','!=', 0)->count();
+                        $count =  $record?->applicantGrades->where('potential_total', '!=', null)->where('potential_total', '!=', 0)->count();
                         $totalPotential = (float)$record?->myGrade->education_total + (float)$record?->myGrade->training_total + (float)$record?->myGrade->experience_total + (float)$record?->myGrade->performance_total + (float)$record?->myGrade->outstanding + (float)$record?->myGrade->application_of_education + (float)$record?->myGrade->l_and_d;
                         $totalPotential += $count != 0 ? (float)$record?->applicantGrades->sum('potential_total') / $count : 0;
 
-                        return number_format($totalPotential,2,'.',',');
+                        return number_format($totalPotential, 2, '.', ',');
                     }),
 
                 // FINAL POINTS END
@@ -256,8 +256,8 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                         ->extraModalActions($this->extraActionsInApplicationTable())
                         ->form([
                             Grid::make([
-                                'default'=>2,
-                                'sm'=>2
+                                'default' => 2,
+                                'sm' => 2
                             ])
                                 ->schema([
                                     Group::make([
@@ -275,24 +275,57 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                             ->label(fn(Get $get) => !!$get('select') ? $get('select') : '')
                                             ->fileUrl(function (Get $get, $record, Set $set) {
                                                 $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
-                                                    if (!!$record->$value) {
-                                                        $set('token', false);
-                                                        $batchinfo = $record->batchInfo->id;
-                                                        $batchName = $record->batchInfo->batch_name;
-                                                        $jobInfo = $record->jobInfo->id;
-                                                        $jobTitle = $record->jobInfo->job_title;
-                                                        $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
-                                                        $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+                                                if (!!$record->$value) {
+                                                    if ($record->copy) {
+                                                            $set('token', false);
+                                                            $oldBatch = RecruitmentJobBatch::where('id', $record->old_batch_id)->first();
 
-                                                        if (Storage::exists($filePath)) {
+                                                            $oldJob = \App\Models\RecruitmetJobApplication::with('jobInfo')->where('job_id', $record->old_job_id)->first();
 
-                                                            return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
-                                                        } else if(Storage::exists($filePathUpdate)) {
-                                                            return Storage::url($filePathUpdate);
+                                                            $batchinfo = $oldBatch->id;
+                                                            $batchName = $oldBatch->batch_name;
+                                                            $jobInfo = $oldJob->jobInfo->id;
+                                                            $jobTitle = $oldJob->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
+                                                        } else {
+                                                            $set('token', false);
+                                                            $batchinfo = $record->batchInfo->id;
+                                                            $batchName = $record->batchInfo->batch_name;
+                                                            $jobInfo = $record->jobInfo->id;
+                                                            $jobTitle = $record->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
                                                         }
+                                                    // $set('token', false);
+                                                    // $batchinfo = $record->batchInfo->id;
+                                                    // $batchName = $record->batchInfo->batch_name;
+                                                    // $jobInfo = $record->jobInfo->id;
+                                                    // $jobTitle = $record->jobInfo->job_title;
+                                                    // $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                    // $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
-                                                    }
+                                                    // if (Storage::exists($filePath)) {
+
+                                                    //     return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                    // } else if (Storage::exists($filePathUpdate)) {
+                                                    //     return Storage::url($filePathUpdate);
+                                                    // }
+                                                }
                                                 $set('token', true);
                                                 return "";
                                             })->minHeight('70svh'),
@@ -305,18 +338,18 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                     ->icon('heroicon-o-check')
                                                     ->color(Color::Green)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>1
+                                                            "$arguments[id]_status" => 1
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('disapproved')
                                                     ->icon('heroicon-o-x-mark')
                                                     ->color(Color::Red)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>2
+                                                            "$arguments[id]_status" => 2
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('comment')
@@ -327,7 +360,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         TextInput::make('comment')
                                                     ])
                                                     ->modalWidth(MaxWidth::Small)
-                                                    ->action(function ($data,$record,$arguments){
+                                                    ->action(function ($data, $record, $arguments) {
                                                         \App\Models\RecruitmentApplicationFileComment::create([
                                                             'application_id' => $record->id,
                                                             'comment' => $data['comment'],
@@ -335,11 +368,11 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                             'id_number' => Auth::user()->id_number
                                                         ]);
                                                         \App\Models\ApplicantLog::create([
-                                                            'activity' => 'Commented by '.Auth::user()->name,
-                                                            'message'=>$data['comment'] ,
+                                                            'activity' => 'Commented by ' . Auth::user()->name,
+                                                            'message' => $data['comment'],
                                                             'id_number' => Auth::user()->id_number,
                                                             'applicant_id' => $record->id,
-                                                            'type'=>'1'
+                                                            'type' => '1'
                                                         ]);
 
                                                         Notification::make()
@@ -354,22 +387,22 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                 ])
                         ])
                         ->hidden(fn($record) => $record->application_status == 1 ? false : true),
-//                    Action::make('Validate')
-//                        ->modalHeading(function ($record) {
-//                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
-//                        })
-//                        ->extraModalActions($this->extraActionsInApplicationTable())
-//                        ->color(Color::Blue)->icon('heroicon-o-eye')
-//                        ->hidden(fn($record) => $record->application_status == 1 ? false : true)
-//                        ->form(function ($record) {
-//                            return $this->allApplicantAttachment($record);
-//                        })
-//                        ->modalSubmitAction(false)
-//                        ->modalCancelAction(false)
-//                        ->closeModalByClickingAway(false)
-//                        ->extraAttributes([
-//                            'id' => 'edit-xx'
-//                        ])->modalWidth(MaxWidth::ScreenLarge),
+                    //                    Action::make('Validate')
+                    //                        ->modalHeading(function ($record) {
+                    //                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
+                    //                        })
+                    //                        ->extraModalActions($this->extraActionsInApplicationTable())
+                    //                        ->color(Color::Blue)->icon('heroicon-o-eye')
+                    //                        ->hidden(fn($record) => $record->application_status == 1 ? false : true)
+                    //                        ->form(function ($record) {
+                    //                            return $this->allApplicantAttachment($record);
+                    //                        })
+                    //                        ->modalSubmitAction(false)
+                    //                        ->modalCancelAction(false)
+                    //                        ->closeModalByClickingAway(false)
+                    //                        ->extraAttributes([
+                    //                            'id' => 'edit-xx'
+                    //                        ])->modalWidth(MaxWidth::ScreenLarge),
 
                     // ########################################### Check File Action #######################################
                     Action::make('Check File')
@@ -404,14 +437,14 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                         ->send();
                                     sleep(1);
 
-                                    return redirect()->route('recruitment.view_job', ['job_title' => $this->job_title,'batch'=> $this->batch,'job_id' => $this->job_id, 'activeTab' => $this->activeTab, 'tableFilters' => $this->tableFilters]);
+                                    return redirect()->route('recruitment.view_job', ['job_title' => $this->job_title, 'batch' => $this->batch, 'job_id' => $this->job_id, 'activeTab' => $this->activeTab, 'tableFilters' => $this->tableFilters]);
                                 })
                                 ->disabled(fn($record) => $record->movs_status != 0 && $record->letter_of_intent_status != 0 && $record->pds_status != 0  && $record->prc_status != 0 && $record->tor_status != 0 && $record->training_attended_status != 0 && $record->certificate_of_employment_status != 0 && $record->latest_appointment_status != 0 && $record->performance_rating_status != 0 && $record->cav_status != 0  && $record->neap_status != 0  ? false  : true)
                         ])
                         ->form([
                             Grid::make([
-                                'default'=>2,
-                                'sm'=>2
+                                'default' => 2,
+                                'sm' => 2
                             ])
                                 ->schema([
                                     Group::make([
@@ -429,28 +462,59 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                             ->label(fn(Get $get) => !!$get('select') ? $get('select') : '')
                                             ->fileUrl(function (Get $get, $record, Set $set) {
                                                 $set('token', true);
-                                                if (!!$get('select'))
-                                                {
+                                                if (!!$get('select')) {
                                                     $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
 
                                                     if (!!$record->$value) {
+                                                        if ($record->copy) {
+                                                            $set('token', false);
+                                                            $oldBatch = RecruitmentJobBatch::where('id', $record->old_batch_id)->first();
 
-                                                        $set('token', false);
-                                                        $batchinfo = $record->batchInfo->id;
-                                                        $batchName = $record->batchInfo->batch_name;
-                                                        $jobInfo = $record->jobInfo->id;
-                                                        $jobTitle = $record->jobInfo->job_title;
-                                                        $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
-                                                        $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+                                                            $oldJob = \App\Models\RecruitmetJobApplication::with('jobInfo')->where('job_id', $record->old_job_id)->first();
 
-                                                        if (Storage::exists($filePath)) {
+                                                            $batchinfo = $oldBatch->id;
+                                                            $batchName = $oldBatch->batch_name;
+                                                            $jobInfo = $oldJob->jobInfo->id;
+                                                            $jobTitle = $oldJob->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
-                                                            return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
-                                                        } else if(Storage::exists($filePathUpdate)) {
-                                                            return Storage::url($filePathUpdate);
+                                                            if (Storage::exists($filePath)) {
 
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
+                                                        } else {
+                                                            $set('token', false);
+                                                            $batchinfo = $record->batchInfo->id;
+                                                            $batchName = $record->batchInfo->batch_name;
+                                                            $jobInfo = $record->jobInfo->id;
+                                                            $jobTitle = $record->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
                                                         }
+                                                        // $set('token', false);
+                                                        // $batchinfo = $record->batchInfo->id;
+                                                        // $batchName = $record->batchInfo->batch_name;
+                                                        // $jobInfo = $record->jobInfo->id;
+                                                        // $jobTitle = $record->jobInfo->job_title;
+                                                        // $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                        // $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
+                                                        // if (Storage::exists($filePath)) {
+
+                                                        //     return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                        // } else if (Storage::exists($filePathUpdate)) {
+                                                        //     return Storage::url($filePathUpdate);
+                                                        // }
                                                     }
                                                     $set('token', true);
                                                     return "";
@@ -467,18 +531,18 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                     ->icon('heroicon-o-check')
                                                     ->color(Color::Green)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>1
+                                                            "$arguments[id]_status" => 1
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('disapproved')
                                                     ->icon('heroicon-o-x-mark')
                                                     ->color(Color::Red)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>2
+                                                            "$arguments[id]_status" => 2
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('comment')
@@ -489,7 +553,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         TextInput::make('comment')
                                                     ])
                                                     ->modalWidth(MaxWidth::Small)
-                                                    ->action(function ($data,$record,$arguments){
+                                                    ->action(function ($data, $record, $arguments) {
                                                         \App\Models\RecruitmentApplicationFileComment::create([
                                                             'application_id' => $record->id,
                                                             'comment' => $data['comment'],
@@ -497,11 +561,11 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                             'id_number' => Auth::user()->id_number
                                                         ]);
                                                         \App\Models\ApplicantLog::create([
-                                                            'activity' => 'Commented by '.Auth::user()->name,
-                                                            'message'=>$data['comment'] ,
+                                                            'activity' => 'Commented by ' . Auth::user()->name,
+                                                            'message' => $data['comment'],
                                                             'id_number' => Auth::user()->id_number,
                                                             'applicant_id' => $record->id,
-                                                            'type'=>'1'
+                                                            'type' => '1'
                                                         ]);
 
                                                         Notification::make()
@@ -516,44 +580,44 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                 ])
                         ])
                         ->hidden(fn($record) => $record->application_status == 0 ? false : true),
-//                    Action::make('Check Filessssssss')
-//                        ->modalHeading(function ($record) {
-//                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
-//                        })
-//                        ->extraModalActions([
-//                            Action::make('extraButton')
-//                                ->label('Approved and proceed to validator')
-//                                ->color(Color::Green)
-//                                ->action(function ($record, $action) {
-//                                    \App\Models\ApplicantLog::create([
-//                                        'activity' => 'Approved(Check Requirements) by ' . Auth::user()->name,
-//                                        'message' => "Pending => Validate",
-//                                        'id_number' => Auth::user()->id_number,
-//                                        'applicant_id' => $record->id,
-//                                        'type' => '1'
-//                                    ]);
-//                                    $record->update([
-//                                        'application_status' => 1
-//                                    ]);
-//                                    Notification::make()
-//                                        ->title('Transfer Data successfully')
-//                                        ->success()
-//                                        ->send();
-//                                    sleep(1);
-//                                    return redirect()->route('recruitment.application.table', ['job_title' => $this->job_title, 'id' => $this->job_id, 'activeTab' => $this->activeTab, 'tableFilters' => $this->tableFilters]);
-//                                })->disabled(fn($record) => $record->movs_status != 0 && $record->letter_of_intent_status != 0 && $record->pds_status != 0  && $record->prc_status != 0 && $record->tor_status != 0 && $record->training_attended_status != 0 && $record->certificate_of_employment_status != 0 && $record->latest_appointment_status != 0 && $record->performance_rating_status != 0 && $record->cav_status != 0   ? false  : true),
-//
-//                        ])
-//                        ->color(Color::Yellow)->icon('heroicon-o-eye')
-//                        ->hidden(fn($record) => $record->application_status == 0 ? false : true)
-//                        ->form(function ($record) {
-//                            return $this->allApplicantAttachment($record);
-//                        })
-//                        ->modalSubmitAction(false)->modalCancelAction(false)
-//                        ->closeModalByClickingAway(false)->extraAttributes([
-//                            'id' => 'edit-xx'
-//                        ])->modalWidth(MaxWidth::ScreenLarge),
-                     ######################################### View  action ##########################################
+                    //                    Action::make('Check Filessssssss')
+                    //                        ->modalHeading(function ($record) {
+                    //                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
+                    //                        })
+                    //                        ->extraModalActions([
+                    //                            Action::make('extraButton')
+                    //                                ->label('Approved and proceed to validator')
+                    //                                ->color(Color::Green)
+                    //                                ->action(function ($record, $action) {
+                    //                                    \App\Models\ApplicantLog::create([
+                    //                                        'activity' => 'Approved(Check Requirements) by ' . Auth::user()->name,
+                    //                                        'message' => "Pending => Validate",
+                    //                                        'id_number' => Auth::user()->id_number,
+                    //                                        'applicant_id' => $record->id,
+                    //                                        'type' => '1'
+                    //                                    ]);
+                    //                                    $record->update([
+                    //                                        'application_status' => 1
+                    //                                    ]);
+                    //                                    Notification::make()
+                    //                                        ->title('Transfer Data successfully')
+                    //                                        ->success()
+                    //                                        ->send();
+                    //                                    sleep(1);
+                    //                                    return redirect()->route('recruitment.application.table', ['job_title' => $this->job_title, 'id' => $this->job_id, 'activeTab' => $this->activeTab, 'tableFilters' => $this->tableFilters]);
+                    //                                })->disabled(fn($record) => $record->movs_status != 0 && $record->letter_of_intent_status != 0 && $record->pds_status != 0  && $record->prc_status != 0 && $record->tor_status != 0 && $record->training_attended_status != 0 && $record->certificate_of_employment_status != 0 && $record->latest_appointment_status != 0 && $record->performance_rating_status != 0 && $record->cav_status != 0   ? false  : true),
+                    //
+                    //                        ])
+                    //                        ->color(Color::Yellow)->icon('heroicon-o-eye')
+                    //                        ->hidden(fn($record) => $record->application_status == 0 ? false : true)
+                    //                        ->form(function ($record) {
+                    //                            return $this->allApplicantAttachment($record);
+                    //                        })
+                    //                        ->modalSubmitAction(false)->modalCancelAction(false)
+                    //                        ->closeModalByClickingAway(false)->extraAttributes([
+                    //                            'id' => 'edit-xx'
+                    //                        ])->modalWidth(MaxWidth::ScreenLarge),
+                    ######################################### View  action ##########################################
                     Action::make('View')
                         ->slideOver()
                         ->modalWidth(MaxWidth::Full)
@@ -566,8 +630,8 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                         ->modalCancelAction(false)
                         ->form([
                             Grid::make([
-                                'default'=>2,
-                                'sm'=>2
+                                'default' => 2,
+                                'sm' => 2
                             ])
                                 ->schema([
                                     Group::make([
@@ -585,25 +649,45 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                             ->label(fn(Get $get) => !!$get('select') ? $get('select') : '')
                                             ->fileUrl(function (Get $get, $record, Set $set) {
                                                 $set('token', true);
-                                                if (!!$get('select'))
-                                                {
+                                                if (!!$get('select')) {
                                                     $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
                                                     if (!!$record->$value) {
-                                                        $set('token', false);
-                                                        $batchinfo = $record->batchInfo->id;
-                                                        $batchName = $record->batchInfo->batch_name;
-                                                        $jobInfo = $record->jobInfo->id;
-                                                        $jobTitle = $record->jobInfo->job_title;
-                                                        $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
-                                                        $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+                                                        if ($record->copy) {
+                                                            $set('token', false);
+                                                            $oldBatch = RecruitmentJobBatch::where('id', $record->old_batch_id)->first();
 
-                                                        if (Storage::exists($filePath)) {
+                                                            $oldJob = \App\Models\RecruitmetJobApplication::with('jobInfo')->where('job_id', $record->old_job_id)->first();
 
-                                                            return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
-                                                        } else if(Storage::exists($filePathUpdate)) {
-                                                            return Storage::url($filePathUpdate);
+                                                            $batchinfo = $oldBatch->id;
+                                                            $batchName = $oldBatch->batch_name;
+                                                            $jobInfo = $oldJob->jobInfo->id;
+                                                            $jobTitle = $oldJob->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
+                                                        } else {
+                                                            $set('token', false);
+                                                            $batchinfo = $record->batchInfo->id;
+                                                            $batchName = $record->batchInfo->batch_name;
+                                                            $jobInfo = $record->jobInfo->id;
+                                                            $jobTitle = $record->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
                                                         }
+
 
                                                         // $batchinfo = $record->batchInfo->id;
                                                         // $jobInfo = $record->jobInfo->id;
@@ -625,18 +709,18 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                     ->icon('heroicon-o-check')
                                                     ->color(Color::Green)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>1
+                                                            "$arguments[id]_status" => 1
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('disapproved')
                                                     ->icon('heroicon-o-x-mark')
                                                     ->color(Color::Red)
                                                     ->iconButton()
-                                                    ->action(function ($record,$arguments){
+                                                    ->action(function ($record, $arguments) {
                                                         $record->update([
-                                                            "$arguments[id]_status"=>2
+                                                            "$arguments[id]_status" => 2
                                                         ]);
                                                     }),
                                                 \Filament\Forms\Components\Actions\Action::make('comment')
@@ -647,7 +731,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                         TextInput::make('comment')
                                                     ])
                                                     ->modalWidth(MaxWidth::Small)
-                                                    ->action(function ($data,$record,$arguments){
+                                                    ->action(function ($data, $record, $arguments) {
                                                         \App\Models\RecruitmentApplicationFileComment::create([
                                                             'application_id' => $record->id,
                                                             'comment' => $data['comment'],
@@ -655,11 +739,11 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                                             'id_number' => Auth::user()->id_number
                                                         ]);
                                                         \App\Models\ApplicantLog::create([
-                                                            'activity' => 'Commented by '.Auth::user()->name,
-                                                            'message'=>$data['comment'] ,
+                                                            'activity' => 'Commented by ' . Auth::user()->name,
+                                                            'message' => $data['comment'],
                                                             'id_number' => Auth::user()->id_number,
                                                             'applicant_id' => $record->id,
-                                                            'type'=>'1'
+                                                            'type' => '1'
                                                         ]);
 
                                                         Notification::make()
@@ -674,31 +758,30 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                 ])
                         ])
                         ->hidden(fn($record) => $record->application_status == 2 || $record->application_status == 4 ? false : true),
-//                    Action::make('View')
-//                        ->modalHeading(function ($record) {
-//                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
-//                        })
-//                        ->color(Color::Blue)->icon('heroicon-o-eye')
-//                        ->hidden(fn($record) => $record->application_status == 2 || $record->application_status == 4 ? false : true)
-//                        ->form(function ($record) {
-//                            return $this->allApplicantAttachment($record);
-//                        })
-//
-//                        ->modalSubmitAction(false)
-//                        ->modalCancelAction(false)
-//                        ->closeModalByClickingAway(false)
-//                        ->extraAttributes([
-//                            'id' => 'edit-xx'
-//                        ])
-//                        ->modalWidth(MaxWidth::ScreenLarge),
+                    //                    Action::make('View')
+                    //                        ->modalHeading(function ($record) {
+                    //                            return new HtmlString("<h1 class='text-black dark:text-white'> $record->fname $record->lname</h1> <h1 class='text-black dark:text-white'>$record->email</h1>");
+                    //                        })
+                    //                        ->color(Color::Blue)->icon('heroicon-o-eye')
+                    //                        ->hidden(fn($record) => $record->application_status == 2 || $record->application_status == 4 ? false : true)
+                    //                        ->form(function ($record) {
+                    //                            return $this->allApplicantAttachment($record);
+                    //                        })
+                    //
+                    //                        ->modalSubmitAction(false)
+                    //                        ->modalCancelAction(false)
+                    //                        ->closeModalByClickingAway(false)
+                    //                        ->extraAttributes([
+                    //                            'id' => 'edit-xx'
+                    //                        ])
+                    //                        ->modalWidth(MaxWidth::ScreenLarge),
                     // ####################################### Update information #################################################
                     EditAction::make('Updates')
                         ->modalHeading(fn($record): string => "Edit Applicant Information ($record->fname $record->lname)")
                         ->label('Update Information')
-                        ->hidden(function(){
-                            if(Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT->value)) return false;
-                            if(Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT_VIEW->value)) return true;
-
+                        ->hidden(function () {
+                            if (Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT->value)) return false;
+                            if (Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT_VIEW->value)) return true;
                         })
                         ->mutateRecordDataUsing(function ($data, $record) {
 
@@ -751,22 +834,56 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                             if (!!$get('select')) {
                                                 $value = \App\Enums\RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
                                                 if (!!$record->$value) {
-                                                    $set('token', false);
+                                                    // $set('token', false);
+                                                    if ($record->copy) {
+                                                        $set('token', false);
+                                                        $oldBatch = RecruitmentJobBatch::where('id', $record->old_batch_id)->first();
 
-                                                    $batchinfo = $record->batchInfo->id;
-                                                    $batchName = $record->batchInfo->batch_name;
-                                                    $jobInfo = $record->jobInfo->id;
-                                                    $jobTitle = $record->jobInfo->job_title;
-                                                    $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
-                                                    $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+                                                        $oldJob = \App\Models\RecruitmetJobApplication::with('jobInfo')->where('job_id', $record->old_job_id)->first();
 
-                                                    if (Storage::exists($filePath)) {
+                                                        $batchinfo = $oldBatch->id;
+                                                        $batchName = $oldBatch->batch_name;
+                                                        $jobInfo = $oldJob->jobInfo->id;
+                                                        $jobTitle = $oldJob->jobInfo->job_title;
+                                                        $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                        $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
 
-                                                        return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
-                                                    } else if(Storage::exists($filePathUpdate)) {
-                                                        return Storage::url($filePathUpdate);
+                                                        if (Storage::exists($filePath)) {
 
+                                                            return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                        } else if (Storage::exists($filePathUpdate)) {
+                                                            return Storage::url($filePathUpdate);
+                                                        }
+                                                    } else {
+                                                        $set('token', false);
+                                                        $batchinfo = $record->batchInfo->id;
+                                                        $batchName = $record->batchInfo->batch_name;
+                                                        $jobInfo = $record->jobInfo->id;
+                                                        $jobTitle = $record->jobInfo->job_title;
+                                                        $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                        $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                        if (Storage::exists($filePath)) {
+
+                                                            return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                        } else if (Storage::exists($filePathUpdate)) {
+                                                            return Storage::url($filePathUpdate);
+                                                        }
                                                     }
+
+                                                    // $batchinfo = $record->batchInfo->id;
+                                                    // $batchName = $record->batchInfo->batch_name;
+                                                    // $jobInfo = $record->jobInfo->id;
+                                                    // $jobTitle = $record->jobInfo->job_title;
+                                                    // $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                    // $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                    // if (Storage::exists($filePath)) {
+
+                                                    //     return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                    // } else if (Storage::exists($filePathUpdate)) {
+                                                    //     return Storage::url($filePathUpdate);
+                                                    // }
 
                                                     // $batchinfo = $record->batchInfo->id;
                                                     // $jobInfo = $record->jobInfo->id;
@@ -938,7 +1055,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                 ->action(function ($data, $record) {
 
                                     $record->update([
-                                        'ies_file'=>$data['ies_file']
+                                        'ies_file' => $data['ies_file']
                                     ]);
                                     Notification::make()
                                         ->title('Uploaded Successfully')
@@ -947,25 +1064,22 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                                 }),
 
                         ])
-                        ->hidden(function(){
-                            if(Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT->value)) return false;
-                            if(Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT_VIEW->value)) return true;
-
-
+                        ->hidden(function () {
+                            if (Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT->value)) return false;
+                            if (Auth::user()->can(\App\Enums\UserManagement\PermissionEnum::RECRUITMENT_VIEW->value)) return true;
                         })
                         ->icon('heroicon-o-arrow-up-tray')
                         ->modalHeading(fn($record) => "$record->fname $record->mname $record->lname")
                         ->form([
                             PdfViewerField::make('IES WITH SIGNED')
-                            ->label('IES WITH SIGN')
-                                   ->minHeight('70svh')
-                                   ->fileUrl(function ($record){
+                                ->label('IES WITH SIGN')
+                                ->minHeight('70svh')
+                                ->fileUrl(function ($record) {
 
 
 
-                                        return Storage::url("public/$record->ies_file");
-
-                                   })->hidden(fn($record): bool => !!$record->ies_file ? false : true),
+                                    return Storage::url("public/$record->ies_file");
+                                })->hidden(fn($record): bool => !!$record->ies_file ? false : true),
                         ])->modalSubmitAction(false)->modalCancelAction(false),
                 ])->extraAttributes(['title' => 'Action button'])
             ])
@@ -979,9 +1093,8 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
                     return !!$record->eligibilityInfo  ? true : false;
                 }
             })
-            ->recordClasses(function ( $record){
-               return $record->batchInfo?->hired_applicant_id == $record?->application_code ? 'hired' : null;
-
+            ->recordClasses(function ($record) {
+                return $record->batchInfo?->hired_applicant_id == $record?->application_code ? 'hired' : null;
             })
             ->paginationPageOptions(['1', '5', '10', '20', '30', 'all'])
             ->striped()
@@ -1562,7 +1675,7 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
             ->icon('heroicon-o-star')
             ->size('xs')
             ->label('PSB GRADING')
-            ->url(route('recruitment.psb_personnel_grading', ['job_id' => $this->job_id, 'job_title' => $this->job_title,'job_batch'=>$this->batch]))
+            ->url(route('recruitment.psb_personnel_grading', ['job_id' => $this->job_id, 'job_title' => $this->job_title, 'job_batch' => $this->batch]))
             ->tooltip("Monitor applicant grades.");
     }
 
@@ -1579,16 +1692,78 @@ class ViewJobInformation extends Component  implements HasActions, HasForms,HasT
             $q->where('batch_id', $this->batch);
         }])->where('job_id', $this->job_id)->first();
     }
+
+    ######################### COPY EMPLOYEE ######################
+    public function modalFormCopyAction()
+    {
+        return \Filament\Actions\Action::make('modalFormCopy')
+
+            ->icon('heroicon-o-clipboard-document')
+            ->size('xs')
+            ->label('Copy Applicant')
+            ->form(function () {
+
+                return [
+                    Select::make('job')->label('Select PSB')
+                        ->options(function(){
+                            $arr = [];
+                            foreach(\App\Models\Recruitment_Job::query()->where('job_id', '!=', $this->job_id)->get() as $row) {
+                                $arr[$row->job_id] = $row->job_title.' - '.$row->plantilla_item;
+                            }
+                            return $arr;
+                        })->live(),
+
+                    Select::make('applicants')
+                        ->multiple()
+                        ->options(options: function (Get $get) {
+                            if (!!$get('job')) {
+                                $arr = [];
+                                foreach (\App\Models\RecruitmetJobApplication::query()->where('job_id', $get('job'))->get() as $key => $value) {
+                                    $arr[$value->id] = $value->fname . ' ' . $value->mname . ' ' . $value->lname;
+                                }
+
+                                return $arr;
+                            }
+                        })
+                        ->hidden(fn(Get $get) => !!$get('job') ? false : true)
+                        ->required()
+                        ->rules(['required'])
+
+
+                ];
+            })
+            ->tooltip("Monitor applicant grades.")->action(function ($data) {
+                $job = \App\Models\Recruitment_Job::query()->where("job_id", $this->job_id)->first();
+
+
+                foreach ($data['applicants'] as $value) {
+
+                    $originalData = \App\Models\RecruitmetJobApplication::query()->with('batchInfo')->where('id', $value)->first();
+                    $copy = $originalData->replicate();
+
+                    $copy->job_id = $this->job_id;
+
+                    $copy->batch_id = $this->jobInfo?->batchInfo->batch_id;
+                    $copy->copy = 1;
+                    $copy->old_id = $originalData->id;
+                    $copy->old_batch_id = $originalData->batchInfo?->id;
+                    $copy->old_job_id = $originalData->job_id;
+                    $copy->save();
+
+                    $application_code = Carbon::now()->format('Y') . '-' . $job->application_code . '-' . $copy->id;
+                    $copy->application_code = $application_code;
+                    $copy->save();
+                }
+            });
+    }
     public function render()
     {
         $this->changeBatch();
-        $allCount = \App\Models\RecruitmetJobApplication::query()->select('job_id','batch_id')->where('job_id', $this->job_id)->where('batch_id', $this->batch)->get()->count();
+        $allCount = \App\Models\RecruitmetJobApplication::query()->select('job_id', 'batch_id')->where('job_id', $this->job_id)->where('batch_id', $this->batch)->get()->count();
         $checkFileCount = \App\Models\RecruitmetJobApplication::query()->where('application_status', 0)->where('batch_id', $this->batch)->where('job_id', $this->job_id)->get()->count();
         $validatorCount = \App\Models\RecruitmetJobApplication::query()->where('application_status', 1)->where('batch_id', $this->batch)->where('job_id', $this->job_id)->get()->count();
         $qualifiedCount = \App\Models\RecruitmetJobApplication::query()->where('application_status', 2)->where('batch_id', $this->batch)->where('job_id', $this->job_id)->get()->count();
         $notqualifiedCount = \App\Models\RecruitmetJobApplication::query()->where('application_status', 4)->where('batch_id', $this->batch)->where('job_id', $this->job_id)->get()->count();
-        return view('livewire.recruitment.view-job-information',compact('checkFileCount', 'validatorCount', 'qualifiedCount', 'allCount', 'notqualifiedCount'))->title($this->job_title);
+        return view('livewire.recruitment.view-job-information', compact('checkFileCount', 'validatorCount', 'qualifiedCount', 'allCount', 'notqualifiedCount'))->title($this->job_title);
     }
 }
-
-

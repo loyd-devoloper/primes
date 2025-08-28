@@ -58,7 +58,11 @@ class RecruitmetJobApplication extends Model
         'job_id',
         'application_status',
         'ies_file',
-        'neap_status'
+        'neap_status',
+        'old_job_id',
+        'copy',
+        'old_id',
+        'old_batch_id'
 
     ];
     // cast

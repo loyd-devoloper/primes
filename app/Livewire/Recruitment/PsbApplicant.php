@@ -2,52 +2,39 @@
 
 namespace App\Livewire\Recruitment;
 
-use App\Traits\RecruitmentPsbTrait;
-use Carbon\Carbon;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\StaticAction;
-use Filament\Forms\Components\Split;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Tables\Actions\CreateAction;
-use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Filament\Tables\Table;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
-use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\HtmlString;
 use App\Enums\RecruitmentLabelEnum;
-use Filament\Forms\Components\Grid;
+use App\Models\RecruitmentJobBatch;
+use App\Traits\RecruitmentPsbTrait;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Split;
 use Filament\Support\Enums\MaxWidth;
+
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Filters\Indicator;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Traits\RecruitmentAttachmentFunctionTrait;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
 
 class PsbApplicant extends Component implements HasForms, HasTable, HasActions
@@ -217,24 +204,59 @@ class PsbApplicant extends Component implements HasForms, HasTable, HasActions
                                             if (!!$get('select')) {
                                                 $value = RecruitmentLabelEnum::tryFrom($get('select'))?->getColumn();
                                                 if (!!$record->$value) {
-                                                    $set('token', false);
-                                             
-                                                    $batchinfo = $record->batchInfo->id;
-                                                    $batchName = $record->batchInfo->batch_name;
-                                                    $jobInfo = $record->jobInfo->id;
-                                                    $jobTitle = $record->jobInfo->job_title;
+                                                    if ($record->copy) {
+                                                            $set('token', false);
+                                                            $oldBatch = RecruitmentJobBatch::where('id', $record->old_batch_id)->first();
 
-                                                    $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
-                                                    $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
-                                                 
-                                                    if (Storage::exists($filePath)) {
-                                                   
-                                                        return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
-                                                    } else if(Storage::exists($filePathUpdate)) {
-                                                        return Storage::url($filePathUpdate);
-                                                  
-                                                    }
-                                                   
+                                                            $oldJob = \App\Models\RecruitmetJobApplication::with('jobInfo')->where('job_id', $record->old_job_id)->first();
+
+                                                            $batchinfo = $oldBatch->id;
+                                                            $batchName = $oldBatch->batch_name;
+                                                            $jobInfo = $oldJob->jobInfo->id;
+                                                            $jobTitle = $oldJob->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
+                                                        } else {
+                                                            $set('token', false);
+                                                            $batchinfo = $record->batchInfo->id;
+                                                            $batchName = $record->batchInfo->batch_name;
+                                                            $jobInfo = $record->jobInfo->id;
+                                                            $jobTitle = $record->jobInfo->job_title;
+                                                            $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                            $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                            if (Storage::exists($filePath)) {
+
+                                                                return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                            } else if (Storage::exists($filePathUpdate)) {
+                                                                return Storage::url($filePathUpdate);
+                                                            }
+                                                        }
+                                                    // $set('token', false);
+
+                                                    // $batchinfo = $record->batchInfo->id;
+                                                    // $batchName = $record->batchInfo->batch_name;
+                                                    // $jobInfo = $record->jobInfo->id;
+                                                    // $jobTitle = $record->jobInfo->job_title;
+
+                                                    // $filePath = "public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value;
+                                                    // $filePathUpdate = "public/recruitment/application/$jobTitle/$batchName/$record->email/" . $record->$value;
+
+                                                    // if (Storage::exists($filePath)) {
+
+                                                    //     return Storage::url("public/recruitment/application/$jobInfo/$batchinfo/$record->email/" . $record->$value);
+                                                    // } else if(Storage::exists($filePathUpdate)) {
+                                                    //     return Storage::url($filePathUpdate);
+
+                                                    // }
+
                                                     // $batchinfo = $record->batchInfo->id;
                                                     // $jobInfo = $record->jobInfo->id;
 

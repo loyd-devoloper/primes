@@ -122,6 +122,7 @@
                                     {{ $this->modalFormActivityLogAction }}
                                     {{ $this->modalFormPsbGradingAction }}
                                     {{ $this->modalFormCarFileAction }}
+                                    {{ $this->modalFormCopyAction }}
                                 </div>
                             </x-filament::fieldset>
                             @endif

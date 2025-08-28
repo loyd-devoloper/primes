@@ -118,16 +118,16 @@
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_departure_am.time"></td>
+                                        x-text="formatTime(date.date_departure_am.time)"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_arrival_pm.time">
+                                        x-text="formatTime(date.date_arrival_pm.time)">
                                     </td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
-                                        x-text="date.date_departure_pm.time"></td>
+                                        x-text="formatTime(date.date_departure_pm.time)"></td>
                                     <td class="border px-2.5 text-center"
                                         :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
                                             'hidden' : ''"
@@ -140,7 +140,10 @@
                                         x-text="convertUndertime('m',date)">
 
                                     </td>
-
+                                    <td class="whitespace-nowrap"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
+                                        x-text="decrease(date)"></td>
                                 </tr>
                             </template>
                             <div>
@@ -198,7 +201,18 @@
 
                 return '';
             },
+               formatTime(time) {
+                if (!time) return '';
+                // Convert 24h to 12h format
+                const [hours, minutes] = time.split(':');
+                const h = parseInt(hours);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const formattedHours = h % 12 || 12;
+                return `${formattedHours}:${minutes} ${ampm}`;
+
+        },
             decrease(date) {
+
                 // if (date.type == 'UT') {
                 //     // this.total += parseInt(date.undertime)
 
@@ -258,7 +272,7 @@
                 } else if (date.type == 'Absent') {
                     return date.type;
                 } else {
-                    return date.date_arrival_am.time;
+                    return this.formatTime(date.date_arrival_am.time);
                 }
 
             },

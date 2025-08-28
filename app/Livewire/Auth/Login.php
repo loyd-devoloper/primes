@@ -58,7 +58,7 @@ class Login extends Component
 
         $this->validate();
 
-        $apiData =  Http::get('https://teahub.depedcalabarzon.ph/api/login-request/$2y$10$cLeGKQPtcL1mXbaAGp6NDeKml4EEN0468YrdSSLnjlMfZNxLgC/' . $this->email . '/' . $this->password);
+        $apiData =  Http::get(env('TEAHUB_URL').'/api/login-request/$2y$10$cLeGKQPtcL1mXbaAGp6NDeKml4EEN0468YrdSSLnjlMfZNxLgC/' . $this->email . '/' . $this->password);
         $result = json_decode($apiData);
 
         if ($result->status == 200) {

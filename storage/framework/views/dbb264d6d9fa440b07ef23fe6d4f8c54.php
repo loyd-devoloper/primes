@@ -20,10 +20,10 @@
 
     <main x-data="skillDisplay">
         
-        <section >
+        <section>
             <div>
 
-                    <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
+                <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['icon' => 'heroicon-m-printer','label' => 'Print','color' => 'secondary','type' => 'button','xOn:click' => 'generateMe()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::icon-button'); ?>
@@ -43,181 +43,184 @@
 <?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
 <?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
 <?php endif; ?>
-                    
-                    <div x-data="{ model: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class="max-w-[15rem] px-1 mb-2">
-                        <?php echo e($this->form); ?>
+                
+                <div x-data="{ model: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class="max-w-[15rem] px-1 mb-2">
+                    <?php echo e($this->form); ?>
 
-                    </div>
-                    <div :id="'table'"
-                        class="block w-fit  overflow-x-auto   mx-auto text-xs relative ">
+                </div>
+                <div :id="'table'" class="block w-fit  overflow-x-auto   mx-auto text-xs relative ">
 
 
-                        <div class=" ">
-                            
-                            <img src="<?php echo e(asset('/assets/dtr_image.png')); ?>" class="max-w-[50rem] " alt="">
-                            <p class="py-2 "><i>Civil Service Form No. 48</i></p>
-                            <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
-                            <p class="text-center ">-----o0o-----</p>
-                            <p class="border-b border-black text-center font-bold mt-4">
-                                <?php echo e(explode('--', $dtrData['user_name'])[1]); ?></p>
-                            <h6 class="text-center text-xs">(Name)</h6>
-                            <div class="grid grid-cols-5 pt-5">
-                                <div class="col-span-2 px-3">
-                                    <p class="text-center">For the month of</p>
-                                    <p class="text-center py-1">Official hours</p>
-                                    <p class="text-center">for arrival and departure</p>
+                    <div class=" ">
+                        
+                        <img src="<?php echo e(asset('/assets/dtr_image.png')); ?>" class="max-w-[50rem] " alt="">
+                        <p class="py-2 "><i>Civil Service Form No. 48</i></p>
+                        <p class="text-center leading-none pt-4 pb-1 font-bold text-lg">DAILY TIME RECORD</p>
+                        <p class="text-center ">-----o0o-----</p>
+                        <p class="border-b border-black text-center font-bold mt-4">
+                            <?php echo e(explode('--', $dtrData['user_name'])[1]); ?></p>
+                        <h6 class="text-center text-xs">(Name)</h6>
+                        <div class="grid grid-cols-5 pt-5">
+                            <div class="col-span-2 px-3">
+                                <p class="text-center">For the month of</p>
+                                <p class="text-center py-1">Official hours</p>
+                                <p class="text-center">for arrival and departure</p>
+                            </div>
+                            <div class="col-span-3">
+                                <p class="border-b border-black text-center font-bold uppercase">
+                                    <?php echo e(\Carbon\Carbon::parse($dtrData['date'])->format('F Y')); ?>
+
+                                </p>
+                                <div class="grid grid-cols-2 py-1">
+                                    <p class="text-center">Regular days</p>
+                                    <div class="border-b border-black"></div>
                                 </div>
-                                <div class="col-span-3">
-                                    <p class="border-b border-black text-center font-bold uppercase">
-                                        <?php echo e(\Carbon\Carbon::parse($dtrData['date'])->format('F Y')); ?>
-
-                                    </p>
-                                    <div class="grid grid-cols-2 py-1">
-                                        <p class="text-center">Regular days</p>
-                                        <div class="border-b border-black"></div>
-                                    </div>
-                                    <div class="grid grid-cols-2">
-                                        <p class="text-center">Saturdays</p>
-                                        <div class="border-b border-black"></div>
-                                    </div>
+                                <div class="grid grid-cols-2">
+                                    <p class="text-center">Saturdays</p>
+                                    <div class="border-b border-black"></div>
                                 </div>
                             </div>
-                            
-                            <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class=" max-w-[50rem]  h-full pt-10">
-                                <table class="border-collapse w-full ">
-                                    <tr class="">
-                                        <td class="border border-black border-solid px-2.5 text-center" rowspan="2">
-                                            Days</td>
-                                        <td class="border-y border-r border-black border-solid px-2.5 text-center"
-                                            colspan="2">
-                                            A.M.</td>
-                                        <td class="border-y border-r border-black border-solid px-2.5 text-center"
-                                            colspan="2">
-                                            P.M.</td>
-                                        <td class="border-y border-r border-black border-solid px-2.5 text-center"
-                                            colspan="2">
-                                            UNDERTIME</td>
-                                    </tr>
-                                    <tr class="">
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">
-                                            Arrival</td>
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">
-                                            Departure
-                                        </td>
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">
-                                            Arrival</td>
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">
-                                            Departure
-                                        </td>
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">Hours
-                                        </td>
-                                        <td class="border-b border-r border-black border-solid px-2.5 text-center">
-                                            Minutes</td>
-                                    </tr>
+                        </div>
+                        
+                        <div x-data="{ employee: <?php echo \Illuminate\Support\Js::from($dtrData)->toHtml() ?> }" class=" max-w-[50rem]  h-full pt-10">
+                            <table class="border-collapse w-full ">
+                                <tr class="">
+                                    <td class="border border-black border-solid px-2.5 text-center" rowspan="2">
+                                        Days</td>
+                                    <td class="border-y border-r border-black border-solid px-2.5 text-center"
+                                        colspan="2">
+                                        A.M.</td>
+                                    <td class="border-y border-r border-black border-solid px-2.5 text-center"
+                                        colspan="2">
+                                        P.M.</td>
+                                    <td class="border-y border-r border-black border-solid px-2.5 text-center"
+                                        colspan="2">
+                                        UNDERTIME</td>
+                                </tr>
+                                <tr class="">
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">
+                                        Arrival</td>
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">
+                                        Departure
+                                    </td>
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">
+                                        Arrival</td>
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">
+                                        Departure
+                                    </td>
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">Hours
+                                    </td>
+                                    <td class="border-b border-r border-black border-solid px-2.5 text-center">
+                                        Minutes</td>
+                                </tr>
 
-                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtrData['dtr'], true)['data']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <tr x-data="{ date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?> }">
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($dtrData['dtr'], true)['data']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dateKey => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr x-data="{ date: <?php echo \Illuminate\Support\Js::from($date)->toHtml() ?>, changeType: false }">
+                                        <td
+                                            class="border-l border-b border-black border-solid px-2.5 py-1  font-bold text-center whitespace-nowrap">
+                                            <?php echo e(explode('-', $dateKey)[1]); ?>
+
+                                        </td>
+
+
+                                        <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_am']['editable'])): ?>
+                                            <!-- Editable Mode -->
+                                            <td x-data="{ toggle: <?php echo e(!empty($date['date_arrival_am']['editable']) && str_contains($date['date_arrival_am']['time'], 'TRAVEL') ? 'true' : 'false'); ?> }"
+                                                class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
+                                                <input type="checkbox" x-model="toggle" id="">
+
+                                                <input x-bind:type="toggle ? 'text' : 'time'"
+                                                    wire:model="name.<?php echo e(explode('-', $dateKey)[0]); ?>-1"
+                                                    class="!text-xs max-w-[7rem] !important" />
+
+                                            </td>
+                                        <?php else: ?>
+                                            <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
+                                                :class="{
+                                                    'font-bold border-r': date.type === 'Absent' || typeof(
+                                                        date
+                                                    ) === 'string' ? true : false
+                                                }"
+                                                :colspan="typeof(date) === 'string' || date.type == 'travel' ? 6 : 1"
+                                                x-text="convertDate(date)"></td>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+
+
+
+
+                                        <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_pm']['editable'])): ?>
+                                            <!-- Editable Mode -->
                                             <td
-                                                class="border-l border-b border-black border-solid px-2.5 py-1  font-bold text-center whitespace-nowrap">
-                                                <?php echo e(explode('-', $dateKey)[1]); ?>
+                                                class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
+
+                                                <input type="time"
+                                                    wire:model="name.<?php echo e(explode('-', $dateKey)[0]); ?>-2"
+                                                    class="!text-xs max-w-[7rem] !important" />
 
                                             </td>
-
-
-                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_am']['editable'])): ?>
-
-                                                    <!-- Editable Mode -->
-                                                    <td
-                                                        class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-
-
-                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-1" class="!text-xs max-w-[5rem] !important" />
-
-                                                    </td>
-
-                                            <?php else: ?>
-                                                <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                    :class="{
-                                                        'font-bold border-r': date.type === 'Absent' || typeof(
-                                                            date
-                                                        ) === 'string' ? true : false
-                                                    }"
-                                                    :colspan="typeof(date) === 'string' || date.type == 'travel' ? 6 : 1"
-                                                    x-text="convertDate(date)"></td>
-                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
-
-
-                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_am']['editable'])): ?>
-
-                                                    <!-- Editable Mode -->
-                                                    <td
-                                                        class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-
-                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-2" class="!text-xs max-w-[5rem] !important" />
-
-                                                    </td>
-
-                                            <?php else: ?>
-                                                  <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_am.time"></td>
-                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
-                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_arrival_pm']['editable'])): ?>
-
-                                                    <!-- Editable Mode -->
-                                                    <td
-                                                        class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-
-                                                            <input type="text" wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-3" class="!text-xs max-w-[5rem] !important" />
-
-                                                    </td>
-
-                                            <?php else: ?>
-                                                 <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_arrival_pm.time">
-                                            </td>
-                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                                            <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_pm']['editable'])): ?>
-
-                                                    <!-- Editable Mode -->
-                                                    <td
-                                                        class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
-
-                                                            <input type="text"  wire:model="name.<?php echo e(explode('-',$dateKey)[0]); ?>-4" class="!text-xs max-w-[5rem] !important" />
-
-                                                    </td>
-
-                                            <?php else: ?>
-                                               <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
-                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="date.date_departure_pm.time"></td>
-                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
+                                        <?php else: ?>
                                             <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="convertUndertime('h',date)">
+                                                x-text="formatTime(date.date_arrival_pm.time)">
+                                            </td>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                        <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_am']['editable'])): ?>
+                                            <!-- Editable Mode -->
+                                            <td
+                                                class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
+
+                                                <input type="time"
+                                                    wire:model="name.<?php echo e(explode('-', $dateKey)[0]); ?>-3"
+                                                    class="!text-xs max-w-[7rem] !important" />
 
                                             </td>
-                                            <td class="border-x border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
+                                        <?php else: ?>
+                                            <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
                                                 :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
-                                                x-text="convertUndertime('m',date)">
+                                                x-text="formatTime(date.date_departure_am.time)"></td>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                        <!--[if BLOCK]><![endif]--><?php if(!empty($date['date_departure_pm']['editable'])): ?>
+                                            <!-- Editable Mode -->
+                                            <td
+                                                class="border-l border-b border-black border-solid px-2.5 py-1 text-center whitespace-nowrap">
+
+                                                <input type="time"
+                                                    wire:model="name.<?php echo e(explode('-', $dateKey)[0]); ?>-4"
+                                                    class="!text-xs max-w-[7rem] !important" />
 
                                             </td>
-                                            
-                                        </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                        <?php else: ?>
+                                            <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
+                                                :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
+                                                x-text="formatTime(date.date_departure_pm.time)"></td>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                </table>
-                            </div>
+                                        <td class="border-l border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
+                                            :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
+                                            x-text="convertUndertime('h',date)">
 
+                                        </td>
+                                        <td class="border-x border-b border-black border-solid px-2.5 py-1  text-center whitespace-nowrap"
+                                            :class="typeof(date) === 'string' || date.type == 'travel' ? 'hidden' : ''"
+                                            x-text="convertUndertime('m',date)">
 
+                                        </td>
+                                        <td class="whitespace-nowrap"
+                                        :class="typeof(date) === 'string' || date.type == 'Absent' || date.type == 'travel' ?
+                                            'hidden' : ''"
+                                        x-text="decrease(date)"></td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+
+                            </table>
                         </div>
 
+
                     </div>
+
                 </div>
+            </div>
 
         </section>
     </main>
@@ -249,9 +252,9 @@
                     const minutes = date.undertime % 60; // Calculate remaining minutes
 
                     if (type == 'm') {
-                        // return minutes > 0 ? minutes : '';
+                        return minutes > 0 ? minutes : '';
                     } else {
-                        // return hours > 0 ? hours : '';
+                        return hours > 0 ? hours : '';
                     }
 
                 }
@@ -260,7 +263,7 @@
             },
             decrease(date) {
 
-                if (date.late > 0 && date.type == 'Full') {
+                if (date.late > 0 ) {
                     // this.total += parseInt(date.late)
 
                     return 'L = ' + date.late;
@@ -304,10 +307,20 @@
                     return date;
                 } else if (date.type == 'Absent') {
 
-                     return date.date_arrival_am.time;
+                    return this.formatTime(date.date_arrival_am.time);
                 } else {
-                    return date.date_arrival_am.time;
+                    return this.formatTime(date.date_arrival_am.time);
                 }
+
+            },
+            formatTime(time) {
+                if (!time) return '';
+                // Convert 24h to 12h format
+                const [hours, minutes] = time.split(':');
+                const h = parseInt(hours);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const formattedHours = h % 12 || 12;
+                return `${formattedHours}:${minutes} ${ampm}`;
 
             },
             updateDtr(value, id) {

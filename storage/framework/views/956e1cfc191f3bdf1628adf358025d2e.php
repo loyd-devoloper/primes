@@ -287,6 +287,8 @@
 
                                     <?php echo e($this->modalFormCarFileAction); ?>
 
+                                    <?php echo e($this->modalFormCopyAction); ?>
+
                                 </div>
                              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

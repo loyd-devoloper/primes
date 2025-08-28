@@ -45,11 +45,10 @@ class Dtr extends Component implements HasForms, HasTable
                 TextColumn::make('date')->date('F Y'),
             ])
             ->actions([
-                EditAction::make('edit')->form([
-                    TextInput::make('name')->label('name'),
-                ]),
+
                 ViewAction::make('information')
-                    ->icon('heroicon-o-eye')
+                ->label('Print')
+                    ->icon('heroicon-m-printer')
                     ->mutateRecordDataUsing(function ($data) {
                         // $this->employee = [
                         //     'author_id' => $data['id_number']
@@ -61,7 +60,7 @@ class Dtr extends Component implements HasForms, HasTable
 
                         return [
                             ViewField::make('viewDtr')
-                                ->view('livewire.leave.my.dtr_view')
+                                ->view('livewire.leave.my.dtr_print_employee')
                                 ->registerActions([
                                     \Filament\Forms\Components\Actions\Action::make('dtr')
                                         ->label('DTR')
@@ -90,7 +89,7 @@ class Dtr extends Component implements HasForms, HasTable
                                         ->modalSubmitAction(false),
 
                                 ])->viewData([
-                                    'dtrArrView' => $record
+                                    'dtrData' => $record
                                 ]),
                         ];
                     })
@@ -102,6 +101,7 @@ class Dtr extends Component implements HasForms, HasTable
                     ->color(Color::Rose)
                     ->size('sm')
                     ->form(function ($record) {
+
                         foreach (json_decode($record->dtr, true)['data'] as $key => $value) {
                             foreach (['date_arrival_am', 'date_departure_am', 'date_arrival_pm', 'date_departure_pm'] as $keyLabel => $valueKey) {
 
@@ -128,6 +128,7 @@ class Dtr extends Component implements HasForms, HasTable
                             // $this->name[explode('-', $key)[1].'-3'] = $value['date_arrival_pm']['time'];
                             // $this->name[explode('-', $key)[1].'-4'] = $value['date_departure_pm']['time'];
                         }
+
                         return [
                             ViewField::make('rating')
                                 ->view('livewire.leave.my.dtr_edit_employee')
@@ -136,7 +137,7 @@ class Dtr extends Component implements HasForms, HasTable
                                 ])
                         ];
                     })
-                    ->modalWidth(MaxWidth::FitContent)
+                    ->modalWidth(MaxWidth::ScreenExtraLarge)
                     ->slideOver()
                     ->action(function ($record) {
 
@@ -152,25 +153,30 @@ class Dtr extends Component implements HasForms, HasTable
                         foreach ($this->name as $key => $value) {
 
                             try {
-                                $time = Carbon::parse($value)->format('h:i A');
-                                if (!!$value) {
-                                    if (explode('-', $key)[1] == 1) {
-                                        $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_arrival_am']['time'] = $time;
-                                    }
-                                    if (explode('-', $key)[1] == 2) {
-                                        $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_arrival_pm']['time'] = $time;
-                                    }
-                                    if (explode('-', $key)[1] == 3) {
-                                        $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_departure_am']['time'] = $time;
-                                    }
-                                    if (explode('-', $key)[1] == 4) {
-                                        $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_departure_pm']['time'] = $time;
-                                    }
+                                // $time = Carbon::parse($value)->format('h:i A');
+                                if (str_contains($value, 'TRAVEL')) {
+                                    $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_arrival_am']['time'] = $value;
                                 }
+                                  $time = Carbon::parse($value)->format('H:i');
+
+                                    if (!!$value) {
+                                        if (explode('-', $key)[1] == 1) {
+                                            $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_arrival_am']['time'] = $time;
+                                        }
+                                        if (explode('-', $key)[1] == 3) {
+                                            $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_arrival_pm']['time'] = $time;
+                                        }
+                                        if (explode('-', $key)[1] == 2) {
+                                            $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_departure_am']['time'] = $time;
+                                        }
+                                        if (explode('-', $key)[1] == 4) {
+                                            $data[explode('-', $key)[0] . '-' . explode('-', $key)[0]]['date_departure_pm']['time'] = $time;
+                                        }
+                                    }
                             } catch (\Exception $e) {
                                 Notification::make()
                                     ->title($e->getMessage())
-                                    ->danger()
+                                    ->success()
                                     ->send();
                             }
                         }
@@ -179,7 +185,9 @@ class Dtr extends Component implements HasForms, HasTable
                         $record->update([
                             'dtr' => json_encode($newData),
                         ]);
-
+                        $late = '';
+                        $undertime = '';
+                        $type = 'Absent';
                         foreach ($newData['data'] as $dayKey => $day) {
 
                             $fc = false;
@@ -190,8 +198,8 @@ class Dtr extends Component implements HasForms, HasTable
                             $departure_start = '';
                             $departure_end = '';
                             $editable = true;
-                            if(is_string($day)) {
-                                   $arr['data'][$dayKey] = $day;
+                            if (is_string($day)) {
+                                $arr['data'][$dayKey] = $day;
                                 continue;
                             }
 
@@ -217,7 +225,7 @@ class Dtr extends Component implements HasForms, HasTable
                                 $type = 'travel';
                                 $editable = false;
                             }
-                            if (true) {
+                            if ($arrival_start  == '' && $departure_start  == '' && $arrival_end  == '' &&  $departure_end == '') {
                                 // if ($arrival_start == '' && $arrival_end == '' && $departure_start == '' && $departure_end == '') {
 
                                 $type = 'Absent';
@@ -281,13 +289,11 @@ class Dtr extends Component implements HasForms, HasTable
                                 }
                             }
                             $arr['data'][$dayKey]['date_arrival_am'] = $day['date_arrival_am'];
-                                    $arr['data'][$dayKey]['date_departure_am'] = $day['date_departure_am'];
-                                            $arr['data'][$dayKey]['date_arrival_pm'] = $day['date_arrival_pm'];
-                                                    $arr['data'][$dayKey]['date_departure_pm'] = $day['date_departure_pm'];
-
-
+                            $arr['data'][$dayKey]['date_departure_am'] = $day['date_departure_am'];
+                            $arr['data'][$dayKey]['date_arrival_pm'] = $day['date_arrival_pm'];
+                            $arr['data'][$dayKey]['date_departure_pm'] = $day['date_departure_pm'];
                         }
-                       $newData['data'] = $arr['data'];
+                        $newData['data'] = $arr['data'];
 
                         $record->update([
                             'dtr' => json_encode($newData),
@@ -296,7 +302,7 @@ class Dtr extends Component implements HasForms, HasTable
 
                         Notification::make()
                             ->title('Updated Successfully!')
-                            ->danger()
+                            ->success()
                             ->send();
                     })
                     ->modalCancelActionLabel('Close')
